@@ -1,4 +1,4 @@
-import { CodeFeedbackType } from "@/types/game";
+import { CodeFeedbackType } from "../types/game";
 
 /**
  * Generates a 4-digit password where all digits 0-9 are unique.

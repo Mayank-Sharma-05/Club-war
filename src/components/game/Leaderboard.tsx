@@ -1,10 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Trophy, Medal, ArrowLeft, RotateCcw, Search } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Trophy,
+  Medal,
+  ArrowLeft,
+  RotateCcw,
+  Search,
+  Trash2,
+  AlertTriangle,
+  X,
+  Lock,
+} from "lucide-react";
 import { LeaderboardEntry } from "@/types/game";
-import { getLeaderboard } from "@/lib/storage";
+import { getLeaderboard, resetLeaderboard, getGameSettings } from "@/lib/storage";
 import { formatTime } from "@/lib/scoring";
 import { sound } from "@/lib/sound-engine";
 
@@ -21,6 +31,9 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
 }) => {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [search, setSearch] = useState("");
+  const [isClearModalOpen, setIsClearModalOpen] = useState(false);
+  const [pinInput, setPinInput] = useState("");
+  const [pinError, setPinError] = useState<string | null>(null);
 
   useEffect(() => {
     setEntries(getLeaderboard());
@@ -31,6 +44,24 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
   );
 
   const top10 = filteredEntries.slice(0, 10);
+
+  const handleConfirmClear = () => {
+    const settings = getGameSettings();
+    const correctPin = settings.operatorPin || "1337";
+
+    if (pinInput.trim() !== correctPin) {
+      setPinError("Invalid Organizer PIN. Enter " + correctPin + " to authorize deletion.");
+      sound.playIncorrect();
+      return;
+    }
+
+    resetLeaderboard();
+    setEntries([]);
+    setIsClearModalOpen(false);
+    setPinInput("");
+    setPinError(null);
+    sound.playClick();
+  };
 
   const getRankBadge = (rank: number) => {
     switch (rank) {
@@ -175,18 +206,36 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
         </div>
 
         {/* Footer Actions */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#E2E8F0]">
-          <button
-            onClick={() => {
-              sound.playClick();
-              onBack();
-            }}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F8FAFC] border border-[#CBD5E1] hover:border-[#94A3B8] text-xs font-semibold text-[#475569] hover:text-[#17212B] flex items-center justify-center space-x-2 transition-colors cursor-pointer shadow-2xs"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Return to Menu</span>
-          </button>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-4 border-t border-[#E2E8F0]">
+          {/* Left: Return to Menu & Clear Leaderboard */}
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => {
+                sound.playClick();
+                onBack();
+              }}
+              className="px-5 py-2.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F8FAFC] border border-[#CBD5E1] hover:border-[#94A3B8] text-xs font-semibold text-[#475569] hover:text-[#17212B] flex items-center justify-center space-x-2 transition-colors cursor-pointer shadow-2xs"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Return to Menu</span>
+            </button>
 
+            {/* Clearly Visible CLEAR LEADERBOARD Button (Subtle Red Outlined Style) */}
+            <button
+              onClick={() => {
+                sound.playClick();
+                setPinInput("");
+                setPinError(null);
+                setIsClearModalOpen(true);
+              }}
+              className="px-4 py-2.5 rounded-xl border border-[#FCA5A5] hover:border-[#EF4444] text-[#DC2626] hover:bg-[#FEF2F2] text-xs font-semibold flex items-center justify-center space-x-1.5 transition-colors cursor-pointer shadow-2xs"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>CLEAR LEADERBOARD</span>
+            </button>
+          </div>
+
+          {/* Right: New Game Session CTA */}
           <button
             onClick={() => {
               sound.playClick();
@@ -199,6 +248,103 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
           </button>
         </div>
       </motion.div>
+
+      {/* Confirmation Dialog with Organizer PIN Verification */}
+      <AnimatePresence>
+        {isClearModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#070B14]/40 backdrop-blur-xs">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="w-full max-w-md bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl p-6 shadow-2xl text-[#17212B]"
+            >
+              {/* Modal Header */}
+              <div className="flex items-start justify-between pb-4 mb-4 border-b border-[#E2E8F0]">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2.5 rounded-xl bg-[#FEE2E2] text-[#DC2626]">
+                    <AlertTriangle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-base text-[#17212B]">
+                      Clear Tournament Leaderboard
+                    </h3>
+                    <p className="text-xs text-[#64748B] mt-0.5">
+                      Permanent deletion of current player rankings
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsClearModalOpen(false)}
+                  className="p-1.5 rounded-lg text-[#64748B] hover:text-[#17212B] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="space-y-4 text-xs">
+                <p className="text-sm font-medium text-[#17212B]">
+                  Are you sure you want to delete all leaderboard records?
+                </p>
+                <p className="text-xs text-[#64748B] leading-relaxed">
+                  This will immediately erase all player scores from this machine. Game settings and system configurations will not be affected.
+                </p>
+
+                {/* Organizer PIN Authorization Step */}
+                <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-2">
+                  <label className="flex items-center space-x-1.5 font-semibold text-[#17212B]">
+                    <Lock className="w-3.5 h-3.5 text-[#0F766E]" />
+                    <span>Organizer PIN Verification (Default: 1337)</span>
+                  </label>
+                  <input
+                    type="password"
+                    maxLength={8}
+                    placeholder="Enter PIN to authorize"
+                    value={pinInput}
+                    onChange={(e) => {
+                      setPinInput(e.target.value);
+                      if (pinError) setPinError(null);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleConfirmClear();
+                    }}
+                    className="w-full bg-[#FFFFFF] border border-[#CBD5E1] focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626] rounded-xl px-3 py-2 text-xs font-mono text-[#17212B] tracking-wider focus:outline-none"
+                  />
+                  {pinError && (
+                    <p className="text-[11px] font-semibold text-[#DC2626]">
+                      {pinError}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Buttons: CANCEL and CONFIRM CLEAR */}
+              <div className="flex items-center justify-end space-x-3 mt-6 pt-4 border-t border-[#E2E8F0]">
+                <button
+                  onClick={() => {
+                    sound.playClick();
+                    setIsClearModalOpen(false);
+                    setPinInput("");
+                    setPinError(null);
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-[#FFFFFF] hover:bg-[#F8FAFC] border border-[#CBD5E1] text-[#475569] hover:text-[#17212B] text-xs font-semibold transition-colors cursor-pointer"
+                >
+                  CANCEL
+                </button>
+
+                <button
+                  onClick={handleConfirmClear}
+                  className="px-5 py-2.5 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-[#FFFFFF] text-xs font-semibold flex items-center space-x-1.5 transition-colors cursor-pointer shadow-xs"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>CONFIRM CLEAR</span>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

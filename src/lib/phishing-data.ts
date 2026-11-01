@@ -1,4 +1,4 @@
-import { PhishingChallengeSet } from "@/types/game";
+import { PhishingChallengeSet } from "../types/game";
 
 export const PHISHING_CHALLENGE_SETS: PhishingChallengeSet[] = [
   {

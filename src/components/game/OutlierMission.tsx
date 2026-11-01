@@ -73,7 +73,7 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col flex-grow">
+    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-6 pb-36 flex flex-col flex-grow">
       {/* Mission Subheader */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-6 border-b border-[#E2E8F0] gap-3">
         <div>

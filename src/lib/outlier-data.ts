@@ -1,4 +1,4 @@
-import { OutlierDataset } from "@/types/game";
+import { OutlierDataset } from "../types/game";
 
 export const OUTLIER_DATASETS: OutlierDataset[] = [
   {

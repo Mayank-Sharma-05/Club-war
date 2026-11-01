@@ -1,4 +1,4 @@
-import { PerformanceClassification } from "@/types/game";
+import { PerformanceClassification } from "../types/game";
 
 export function getComboMultiplier(streak: number): number {
   if (streak >= 5) return 2.0;

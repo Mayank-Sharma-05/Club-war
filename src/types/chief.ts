@@ -41,5 +41,8 @@ export interface ChiefDialogue {
 export interface ChiefSettings {
   voiceEnabled: boolean;
   volume: number; // 0.0 to 1.0
-  rate: number; // 0.8 to 1.3
+  rate: number; // 0.92 to 0.98
+  pitch: number; // 0.85 to 0.95
+  showText: boolean; // Show dialogue text bubble
+  preferredVoiceURI?: string; // Explicitly selected voice URI
 }

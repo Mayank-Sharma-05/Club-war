@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { ChiefDialogue, ChiefEmotion, ChiefEventType } from "@/types/chief";
+import { ChiefDialogue, ChiefEmotion, ChiefEventType, ChiefSettings } from "@/types/chief";
 import { chiefSpeech } from "@/lib/chief/speech-manager";
 
 export function useChief() {
@@ -9,7 +9,9 @@ export function useChief() {
   const [emotion, setEmotion] = useState<ChiefEmotion>("idle");
   const [dialogue, setDialogue] = useState<ChiefDialogue | null>(null);
   const [voiceEnabled, setVoiceEnabledState] = useState(true);
-  const [volume, setVolumeState] = useState(0.9);
+  const [volume, setVolumeState] = useState(1.0);
+  const [showText, setShowTextState] = useState(true);
+  const [selectedVoiceName, setSelectedVoiceName] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = chiefSpeech.subscribe((state) => {
@@ -18,6 +20,8 @@ export function useChief() {
       setDialogue(state.currentDialogue);
       setVoiceEnabledState(state.voiceEnabled);
       setVolumeState(state.volume);
+      setShowTextState(state.showText);
+      setSelectedVoiceName(state.selectedVoiceName);
     });
 
     return () => {
@@ -33,6 +37,10 @@ export function useChief() {
     chiefSpeech.setVoiceEnabled(enabled);
   }, []);
 
+  const setShowText = useCallback((show: boolean) => {
+    chiefSpeech.setShowText(show);
+  }, []);
+
   const setVolume = useCallback((val: number) => {
     chiefSpeech.setVolume(val);
   }, []);
@@ -41,8 +49,28 @@ export function useChief() {
     chiefSpeech.replayLast();
   }, []);
 
+  const testVoice = useCallback(() => {
+    chiefSpeech.testVoice();
+  }, []);
+
   const cancelSpeech = useCallback(() => {
     chiefSpeech.cancelSpeech();
+  }, []);
+
+  const dismissDialogue = useCallback(() => {
+    chiefSpeech.dismissDialogue();
+  }, []);
+
+  const setPreferredVoice = useCallback((voiceURI: string) => {
+    chiefSpeech.setPreferredVoice(voiceURI);
+  }, []);
+
+  const getAvailableVoices = useCallback(() => {
+    return chiefSpeech.getAvailableVoices();
+  }, []);
+
+  const getSettings = useCallback((): ChiefSettings => {
+    return chiefSpeech.getSettings();
   }, []);
 
   return {
@@ -51,10 +79,18 @@ export function useChief() {
     dialogue,
     voiceEnabled,
     volume,
+    showText,
+    selectedVoiceName,
     trigger,
     setVoiceEnabled,
+    setShowText,
     setVolume,
     replayLast,
+    testVoice,
     cancelSpeech,
+    dismissDialogue,
+    setPreferredVoice,
+    getAvailableVoices,
+    getSettings,
   };
 }

@@ -110,7 +110,7 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
   }, [handleInputDigit, handleDelete, handleSubmit, isUnlocked, isFailed]);
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-6 flex flex-col flex-grow items-center">
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-6 pb-36 flex flex-col flex-grow items-center">
       {/* Mission Subheader */}
       <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-6 border-b border-[#E2E8F0] gap-3">
         <div>
