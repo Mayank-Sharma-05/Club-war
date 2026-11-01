@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { OutlierDataset } from "@/types/game";
-import { BarChart2, CheckCircle2, XCircle, AlertCircle, Sparkles, Info } from "lucide-react";
+import { BarChart2, CheckCircle2, XCircle, AlertCircle, Info } from "lucide-react";
 import { sound } from "@/lib/sound-engine";
 
 interface OutlierMissionProps {
@@ -75,58 +75,58 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
   return (
     <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col flex-grow">
       {/* Mission Subheader */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-6 border-b border-[#263244] gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-6 border-b border-[#E2E8F0] gap-3">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-semibold text-[#A78BFA] uppercase tracking-wider mb-1">
-            <BarChart2 className="w-4 h-4 text-[#A78BFA]" />
+          <div className="flex items-center space-x-2 text-xs font-semibold text-[#4F46E5] uppercase tracking-wider mb-1">
+            <BarChart2 className="w-4 h-4 text-[#4F46E5]" />
             <span>Mission 02 — Layer 2 Telemetry</span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-semibold text-[#F1F5F9] tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold text-[#17212B] tracking-tight">
             Outlier Hunt: {dataset.title}
           </h2>
-          <p className="text-sm text-[#A1AEC0] mt-1">{dataset.metricDescription}</p>
+          <p className="text-sm text-[#475569] mt-1">{dataset.metricDescription}</p>
         </div>
 
         {/* Selection Status Badge */}
-        <div className="inline-flex items-center space-x-2.5 bg-[#111827] px-4 py-2.5 rounded-xl border border-[#263244] self-start sm:self-auto">
-          <span className="text-xs text-[#718096]">Selected:</span>
-          <span className="text-xs font-mono font-semibold text-[#A78BFA]">
-            {selectedIndices.length} / {dataset.targetOutlierCount} Anomalies
+        <div className="inline-flex items-center space-x-2.5 bg-[#FFFFFF] px-4 py-2 rounded-xl border border-[#E2E8F0] self-start sm:self-auto shadow-xs">
+          <span className="text-xs font-medium text-[#64748B]">Selected:</span>
+          <span className="text-xs font-mono font-bold text-[#4F46E5]">
+            {selectedIndices.length} of {dataset.targetOutlierCount} Anomalies
           </span>
         </div>
       </div>
 
       {/* Main Dataset Card */}
-      <div className="bg-[#111827] border border-[#263244] rounded-2xl p-6 mb-6">
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#263244]">
-          <span className="text-xs font-medium text-[#A1AEC0]">
-            Numerical Observations Stream ({dataset.unit})
+      <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-xs mb-6">
+        <div className="flex items-center justify-between mb-5 pb-3 border-b border-[#E2E8F0]">
+          <span className="text-sm font-semibold text-[#17212B]">
+            Observation Samples ({dataset.unit})
           </span>
-          <span className="text-xs text-[#718096]">
-            Target: Identify {dataset.targetOutlierCount} statistical outliers
+          <span className="text-xs text-[#64748B] font-medium">
+            Goal: Detect {dataset.targetOutlierCount} statistical anomalies
           </span>
         </div>
 
-        {/* Numerical Observations Grid: 6 columns on desktop, 4 on tablet, 2 on small screens */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 mb-6">
+        {/* Clean Numerical Observation Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3.5 mb-6">
           {dataset.values.map((val, idx) => {
             const isSelected = selectedIndices.includes(idx);
             const isActualOutlier = dataset.outlierIndices.includes(idx);
 
-            let borderStyle = "border-[#263244] bg-[#151F2E] text-[#F1F5F9] hover:border-[#334155]";
+            let borderStyle = "border-[#E2E8F0] bg-[#F8FAFC] text-[#17212B] hover:border-[#CBD5E1] hover:bg-[#FFFFFF]";
 
             if (isEvaluated) {
               if (isSelected && isActualOutlier) {
-                borderStyle = "border-[#22C55E] bg-[#22C55E]/15 text-[#22C55E]";
+                borderStyle = "border-[#15803D] bg-[#DCFCE7] text-[#15803D] ring-2 ring-[#15803D]/20";
               } else if (isSelected && !isActualOutlier) {
-                borderStyle = "border-[#EF4444] bg-[#EF4444]/15 text-[#EF4444]";
+                borderStyle = "border-[#DC2626] bg-[#FEE2E2] text-[#DC2626] ring-2 ring-[#DC2626]/20";
               } else if (!isSelected && isActualOutlier) {
-                borderStyle = "border-[#F59E0B] bg-[#F59E0B]/15 text-[#F59E0B]";
+                borderStyle = "border-[#D97706] bg-[#FEF3C7] text-[#D97706]";
               } else {
-                borderStyle = "border-[#263244]/40 bg-[#151F2E]/30 text-[#718096]/50";
+                borderStyle = "border-[#E2E8F0]/60 bg-[#F8FAFC]/50 text-[#94A3B8]";
               }
             } else if (isSelected) {
-              borderStyle = "border-[#A78BFA] bg-[#A78BFA]/15 text-[#F1F5F9]";
+              borderStyle = "border-[#4F46E5] bg-[#EEF2FF] text-[#4F46E5] ring-2 ring-[#4F46E5]/20";
             }
 
             return (
@@ -138,14 +138,14 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
                 className={`relative flex flex-col items-center justify-between p-4 rounded-xl border transition-all cursor-pointer h-24 ${borderStyle}`}
               >
                 {/* Observation label */}
-                <span className="text-[11px] font-mono text-[#718096] self-start">
+                <span className="text-[11px] font-mono text-[#64748B] self-start">
                   #{String(idx + 1).padStart(2, "0")}
                 </span>
 
                 {/* Primary Number Display */}
-                <div className="font-mono font-semibold text-xl tracking-tight my-auto">
+                <div className="font-mono font-bold text-xl tracking-tight my-auto">
                   {val}
-                  <span className="text-xs text-[#718096] ml-1 font-normal">
+                  <span className="text-xs text-[#64748B] ml-1 font-normal">
                     {dataset.unit}
                   </span>
                 </div>
@@ -154,13 +154,13 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
                 {isEvaluated && (
                   <div className="absolute top-2 right-2">
                     {isSelected && isActualOutlier && (
-                      <CheckCircle2 className="w-4 h-4 text-[#22C55E]" />
+                      <CheckCircle2 className="w-4 h-4 text-[#15803D]" />
                     )}
                     {isSelected && !isActualOutlier && (
-                      <XCircle className="w-4 h-4 text-[#EF4444]" />
+                      <XCircle className="w-4 h-4 text-[#DC2626]" />
                     )}
                     {!isSelected && isActualOutlier && (
-                      <AlertCircle className="w-4 h-4 text-[#F59E0B]" />
+                      <AlertCircle className="w-4 h-4 text-[#D97706]" />
                     )}
                   </div>
                 )}
@@ -171,16 +171,16 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
 
         {/* Action Row */}
         {!isEvaluated ? (
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#263244]">
-            <div className="flex items-center space-x-2 text-xs text-[#718096]">
-              <Info className="w-4 h-4 text-[#A78BFA] shrink-0" />
-              <span>Select {dataset.targetOutlierCount} anomalous values that deviate from the normal distribution.</span>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#E2E8F0]">
+            <div className="flex items-center space-x-2 text-xs text-[#64748B]">
+              <Info className="w-4 h-4 text-[#4F46E5] shrink-0" />
+              <span>Click to select the {dataset.targetOutlierCount} abnormal values deviating significantly from the cluster.</span>
             </div>
 
             <button
               onClick={handleSubmit}
               disabled={selectedIndices.length === 0}
-              className="w-full sm:w-auto px-7 py-2.5 rounded-xl bg-[#A78BFA] hover:bg-[#A78BFA]/90 text-[#090D14] font-semibold text-xs tracking-wide flex items-center justify-center space-x-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              className="w-full sm:w-auto px-7 py-3 rounded-xl bg-[#0F766E] hover:bg-[#0D655E] text-[#FFFFFF] font-semibold text-xs tracking-wide flex items-center justify-center space-x-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-sm"
             >
               <span>Submit Analysis</span>
             </button>
@@ -194,42 +194,42 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`w-full bg-[#111827] border rounded-xl p-5 sm:p-6 shadow-lg ${
+            className={`w-full bg-[#FFFFFF] border rounded-2xl p-6 shadow-sm ${
               evaluationResult.allFound
-                ? "border-[#22C55E]/40"
-                : "border-[#A78BFA]/40"
+                ? "border-[#15803D]/40"
+                : "border-[#4F46E5]/40"
             }`}
           >
             <div className="flex items-start space-x-4">
-              <div className="p-2.5 rounded-lg bg-[#A78BFA]/15 text-[#A78BFA] shrink-0 mt-0.5">
+              <div className="p-3 rounded-xl bg-[#EEF2FF] text-[#4F46E5] shrink-0 mt-0.5">
                 <BarChart2 className="w-6 h-6" />
               </div>
               <div className="flex-grow">
-                <div className="flex items-center space-x-2.5 mb-1">
-                  <span className="text-xs font-semibold text-[#A78BFA] uppercase tracking-wider">
+                <div className="flex items-center space-x-2.5 mb-1.5">
+                  <span className="text-xs font-bold text-[#4F46E5] uppercase tracking-wider">
                     Telemetry Analysis Complete
                   </span>
                   <span
-                    className={`px-2 py-0.5 rounded text-xs font-mono font-medium ${
+                    className={`px-2.5 py-0.5 rounded text-xs font-mono font-semibold ${
                       evaluationResult.score > 0
-                        ? "bg-[#22C55E]/15 text-[#22C55E]"
-                        : "bg-[#EF4444]/15 text-[#EF4444]"
+                        ? "bg-[#DCFCE7] text-[#15803D]"
+                        : "bg-[#FEE2E2] text-[#DC2626]"
                     }`}
                   >
                     +{evaluationResult.score} Pts
                   </span>
                   {evaluationResult.allFound && (
-                    <span className="bg-[#22C55E]/15 text-[#22C55E] px-2 py-0.5 rounded text-xs font-mono font-medium">
-                      All Outliers Found (+100 Bonus)
+                    <span className="bg-[#DCFCE7] text-[#15803D] px-2.5 py-0.5 rounded text-xs font-mono font-semibold">
+                      All Outliers Identified (+100 Bonus)
                     </span>
                   )}
                 </div>
 
-                <p className="text-sm text-[#A1AEC0] leading-relaxed max-w-4xl">
+                <p className="text-sm text-[#475569] leading-relaxed max-w-4xl">
                   {dataset.explanation}
                 </p>
-                <div className="text-xs text-[#718096] mt-2">
-                  Advancing to Mission 03: Crack the Code...
+                <div className="text-xs font-medium text-[#0F766E] mt-3">
+                  Advancing to Mission 03: Crack the Code in 2 seconds...
                 </div>
               </div>
             </div>

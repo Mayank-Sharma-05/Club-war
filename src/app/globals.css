@@ -4,31 +4,31 @@
   --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   
-  --color-bg-main: #090D14;
-  --color-surface-main: #111827;
-  --color-surface-secondary: #151F2E;
-  --color-border-subtle: #263244;
-  --color-border-light: #334155;
+  --color-app-bg: #F4F6F8;
+  --color-card-bg: #FFFFFF;
+  --color-surface-subtle: #F8FAFC;
+  --color-border-main: #E2E8F0;
+  --color-border-subtle: #CBD5E1;
   
-  --color-text-primary: #F1F5F9;
-  --color-text-secondary: #A1AEC0;
-  --color-text-muted: #718096;
+  --color-text-primary: #17212B;
+  --color-text-secondary: #475569;
+  --color-text-muted: #64748B;
   
-  --color-accent-cyan: #22D3EE;
-  --color-accent-purple: #A78BFA;
-  --color-status-success: #22C55E;
-  --color-status-warning: #F59E0B;
-  --color-status-danger: #EF4444;
+  --color-primary-teal: #0F766E;
+  --color-secondary-indigo: #4F46E5;
+  --color-status-success: #15803D;
+  --color-status-warning: #D97706;
+  --color-status-danger: #DC2626;
 }
 
 :root {
-  --background: #090D14;
-  --foreground: #F1F5F9;
+  --background: #F4F6F8;
+  --foreground: #17212B;
 }
 
 body {
-  background-color: #090D14;
-  color: #F1F5F9;
+  background-color: #F4F6F8;
+  color: #17212B;
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
   user-select: none;
@@ -36,26 +36,27 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Subtle background grid - minimal and restrained */
-.bg-subtle-grid {
-  background-size: 32px 32px;
+/* Subtle SaaS background grid pattern */
+.bg-light-pattern {
+  background-color: #F4F6F8;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
 
-/* Clean Custom Scrollbar */
+/* Crisp Clean Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #090D14;
+  background: #F4F6F8;
 }
 ::-webkit-scrollbar-thumb {
-  background: #263244;
+  background: #CBD5E1;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #94A3B8;
 }

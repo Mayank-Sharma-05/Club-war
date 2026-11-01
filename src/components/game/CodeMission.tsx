@@ -104,22 +104,22 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
   return (
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-6 flex flex-col flex-grow items-center">
       {/* Mission Subheader */}
-      <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-6 border-b border-[#263244] gap-3">
+      <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-6 border-b border-[#E2E8F0] gap-3">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-semibold text-[#22C55E] uppercase tracking-wider mb-1">
-            <KeyRound className="w-4 h-4 text-[#22C55E]" />
+          <div className="flex items-center space-x-2 text-xs font-semibold text-[#15803D] uppercase tracking-wider mb-1">
+            <KeyRound className="w-4 h-4 text-[#15803D]" />
             <span>Mission 03 — Layer 3 Core Security</span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-semibold text-[#F1F5F9] tracking-tight">
-            Crack the Code: Security Vault
+          <h2 className="text-xl sm:text-2xl font-bold text-[#17212B] tracking-tight">
+            Crack the Code: Digital Vault
           </h2>
         </div>
 
-        <div className="inline-flex items-center space-x-2 bg-[#111827] px-4 py-2 rounded-xl border border-[#263244] self-start sm:self-auto">
-          <span className="text-xs text-[#718096]">Attempts Remaining:</span>
+        <div className="inline-flex items-center space-x-2 bg-[#FFFFFF] px-4 py-2 rounded-xl border border-[#E2E8F0] self-start sm:self-auto shadow-xs">
+          <span className="text-xs font-medium text-[#64748B]">Attempts Remaining:</span>
           <span
-            className={`text-xs font-mono font-semibold ${
-              attemptsRemaining <= 1 ? "text-[#EF4444]" : "text-[#22C55E]"
+            className={`text-xs font-mono font-bold ${
+              attemptsRemaining <= 1 ? "text-[#DC2626]" : "text-[#15803D]"
             }`}
           >
             {attemptsRemaining} of {maxAttempts}
@@ -130,30 +130,30 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
       {/* Main 2-Column Stage */}
       <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 my-auto">
         {/* Left Side: Attempt History & Color Guide */}
-        <div className="bg-[#111827] border border-[#263244] rounded-2xl p-6 flex flex-col justify-between">
+        <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl p-6 sm:p-7 flex flex-col justify-between shadow-xs">
           <div>
-            <div className="flex items-center justify-between pb-3 mb-4 border-b border-[#263244]">
-              <span className="text-xs font-medium text-[#A1AEC0]">
+            <div className="flex items-center justify-between pb-3 mb-4 border-b border-[#E2E8F0]">
+              <span className="text-xs font-semibold text-[#475569]">
                 Vault Status
               </span>
               <div
-                className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs font-medium ${
+                className={`flex items-center space-x-1.5 px-3 py-1 rounded-lg text-xs font-semibold ${
                   isUnlocked
-                    ? "bg-[#22C55E]/15 text-[#22C55E]"
+                    ? "bg-[#DCFCE7] text-[#15803D]"
                     : isFailed
-                    ? "bg-[#EF4444]/15 text-[#EF4444]"
-                    : "bg-[#151F2E] text-[#A1AEC0]"
+                    ? "bg-[#FEE2E2] text-[#DC2626]"
+                    : "bg-[#F8FAFC] text-[#475569] border border-[#E2E8F0]"
                 }`}
               >
                 {isUnlocked ? (
                   <>
                     <Unlock className="w-3.5 h-3.5" />
-                    <span>Unlocked</span>
+                    <span>Vault Unlocked</span>
                   </>
                 ) : isFailed ? (
                   <>
                     <Lock className="w-3.5 h-3.5" />
-                    <span>Locked Out</span>
+                    <span>Lockout Active</span>
                   </>
                 ) : (
                   <>
@@ -166,8 +166,8 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
 
             {/* Past Attempts List */}
             <div className="space-y-2 mb-4">
-              <span className="text-xs text-[#718096] block mb-2 font-medium">
-                Attempt History
+              <span className="text-xs text-[#64748B] block mb-2 font-medium">
+                Attempt History (Max 5)
               </span>
 
               {Array.from({ length: maxAttempts }).map((_, slotIdx) => {
@@ -176,13 +176,13 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
                 return (
                   <div
                     key={slotIdx}
-                    className={`flex items-center justify-between p-2.5 rounded-lg border transition-colors ${
+                    className={`flex items-center justify-between p-2.5 rounded-xl border transition-colors ${
                       record
-                        ? "bg-[#151F2E] border-[#263244]"
-                        : "bg-[#151F2E]/30 border-[#263244]/40 opacity-40"
+                        ? "bg-[#F8FAFC] border-[#E2E8F0]"
+                        : "bg-[#F8FAFC]/40 border-[#E2E8F0]/40 opacity-40"
                     }`}
                   >
-                    <span className="font-mono text-xs text-[#718096] w-6">
+                    <span className="font-mono text-xs text-[#64748B] w-6">
                       #{slotIdx + 1}
                     </span>
 
@@ -190,14 +190,14 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
                       <div className="flex space-x-2">
                         {record.guess.split("").map((digit, dIdx) => {
                           const feedback = record.feedback[dIdx];
-                          let colorStyle = "bg-[#EF4444] text-[#F1F5F9]"; // red
-                          if (feedback === "green") colorStyle = "bg-[#22C55E] text-[#090D14] font-semibold";
-                          if (feedback === "yellow") colorStyle = "bg-[#F59E0B] text-[#090D14] font-semibold";
+                          let colorStyle = "bg-[#DC2626] text-[#FFFFFF]"; // red
+                          if (feedback === "green") colorStyle = "bg-[#15803D] text-[#FFFFFF] font-bold";
+                          if (feedback === "yellow") colorStyle = "bg-[#D97706] text-[#FFFFFF] font-bold";
 
                           return (
                             <div
                               key={dIdx}
-                              className={`w-8 h-8 rounded-md flex items-center justify-center font-mono text-sm ${colorStyle}`}
+                              className={`w-8 h-8 rounded-lg flex items-center justify-center font-mono text-sm ${colorStyle}`}
                             >
                               {digit}
                             </div>
@@ -209,7 +209,7 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
                         {[0, 1, 2, 3].map((emptyIdx) => (
                           <div
                             key={emptyIdx}
-                            className="w-8 h-8 rounded-md border border-dashed border-[#263244] flex items-center justify-center text-[#718096]/40 font-mono text-xs"
+                            className="w-8 h-8 rounded-lg border border-dashed border-[#CBD5E1] flex items-center justify-center text-[#94A3B8] font-mono text-xs"
                           >
                             ·
                           </div>
@@ -217,7 +217,7 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
                       </div>
                     )}
 
-                    <span className="text-xs font-mono text-[#718096] w-12 text-right">
+                    <span className="text-xs font-mono text-[#64748B] w-12 text-right">
                       {record
                         ? record.feedback.every((f) => f === "green")
                           ? "Match"
@@ -231,26 +231,26 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
           </div>
 
           {/* Color Guide Reference */}
-          <div className="pt-3 border-t border-[#263244] grid grid-cols-3 gap-2 text-xs text-center font-medium">
-            <div className="flex items-center justify-center space-x-1.5 text-[#22C55E]">
-              <div className="w-2.5 h-2.5 rounded bg-[#22C55E]" />
+          <div className="pt-3 border-t border-[#E2E8F0] grid grid-cols-3 gap-2 text-xs text-center font-semibold">
+            <div className="flex items-center justify-center space-x-1.5 text-[#15803D]">
+              <div className="w-2.5 h-2.5 rounded bg-[#15803D]" />
               <span>Correct Spot</span>
             </div>
-            <div className="flex items-center justify-center space-x-1.5 text-[#F59E0B]">
-              <div className="w-2.5 h-2.5 rounded bg-[#F59E0B]" />
+            <div className="flex items-center justify-center space-x-1.5 text-[#D97706]">
+              <div className="w-2.5 h-2.5 rounded bg-[#D97706]" />
               <span>Wrong Spot</span>
             </div>
-            <div className="flex items-center justify-center space-x-1.5 text-[#EF4444]">
-              <div className="w-2.5 h-2.5 rounded bg-[#EF4444]" />
+            <div className="flex items-center justify-center space-x-1.5 text-[#DC2626]">
+              <div className="w-2.5 h-2.5 rounded bg-[#DC2626]" />
               <span>Not in Code</span>
             </div>
           </div>
         </div>
 
         {/* Right Side: Passcode Slots & Keypad */}
-        <div className="bg-[#111827] border border-[#263244] rounded-2xl p-6 flex flex-col justify-between">
+        <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl p-6 sm:p-7 flex flex-col justify-between shadow-xs">
           <div>
-            <span className="text-xs font-medium text-[#A1AEC0] block mb-3">
+            <span className="text-xs font-semibold text-[#475569] block mb-3">
               Enter 4-Digit Passcode
             </span>
 
@@ -261,12 +261,12 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
                 return (
                   <div
                     key={pos}
-                    className={`w-14 h-16 rounded-xl border flex items-center justify-center font-mono font-semibold text-2xl transition-colors ${
+                    className={`w-14 h-16 rounded-xl border flex items-center justify-center font-mono font-bold text-2xl transition-colors ${
                       char
-                        ? "bg-[#151F2E] border-[#22D3EE] text-[#F1F5F9]"
+                        ? "bg-[#FFFFFF] border-[#0F766E] text-[#17212B] ring-2 ring-[#0F766E]/15"
                         : pos === currentGuess.length
-                        ? "bg-[#151F2E] border-[#334155]"
-                        : "bg-[#151F2E]/40 border-[#263244] text-[#718096]/30"
+                        ? "bg-[#F8FAFC] border-[#0F766E]"
+                        : "bg-[#F8FAFC] border-[#E2E8F0] text-[#CBD5E1]"
                     }`}
                   >
                     {char || ""}
@@ -278,7 +278,7 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
             {/* Error message */}
             <div className="min-h-[22px] flex items-center justify-center">
               {inputError && (
-                <div className="flex items-center space-x-1.5 text-xs text-[#EF4444]">
+                <div className="flex items-center space-x-1.5 text-xs text-[#DC2626] font-medium">
                   <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                   <span>{inputError}</span>
                 </div>
@@ -297,8 +297,8 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
                   disabled={isUnlocked || isFailed}
                   className={`py-3.5 rounded-xl border font-mono font-semibold text-lg transition-colors cursor-pointer ${
                     isUsed
-                      ? "bg-[#151F2E]/40 border-[#263244] text-[#718096]/40 cursor-not-allowed"
-                      : "bg-[#151F2E] border-[#263244] hover:border-[#334155] hover:bg-[#1A2638] text-[#F1F5F9]"
+                      ? "bg-[#F8FAFC] border-[#E2E8F0] text-[#CBD5E1] cursor-not-allowed"
+                      : "bg-[#FFFFFF] border-[#E2E8F0] hover:border-[#0F766E] hover:bg-[#F0FDFA] text-[#17212B] shadow-2xs"
                   }`}
                 >
                   {digit}
@@ -310,7 +310,7 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
             <button
               onClick={handleDelete}
               disabled={isUnlocked || isFailed || currentGuess.length === 0}
-              className="py-3.5 rounded-xl border border-[#263244] bg-[#151F2E] hover:border-[#334155] text-[#A1AEC0] hover:text-[#F1F5F9] flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              className="py-3.5 rounded-xl border border-[#E2E8F0] bg-[#FFFFFF] hover:border-[#DC2626] hover:bg-[#FEF2F2] text-[#475569] hover:text-[#DC2626] flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-2xs"
             >
               <Delete className="w-5 h-5" />
             </button>
@@ -321,8 +321,8 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
               disabled={isUnlocked || isFailed}
               className={`py-3.5 rounded-xl border font-mono font-semibold text-lg transition-colors cursor-pointer ${
                 currentGuess.includes("0")
-                  ? "bg-[#151F2E]/40 border-[#263244] text-[#718096]/40 cursor-not-allowed"
-                  : "bg-[#151F2E] border-[#263244] hover:border-[#334155] hover:bg-[#1A2638] text-[#F1F5F9]"
+                  ? "bg-[#F8FAFC] border-[#E2E8F0] text-[#CBD5E1] cursor-not-allowed"
+                  : "bg-[#FFFFFF] border-[#E2E8F0] hover:border-[#0F766E] hover:bg-[#F0FDFA] text-[#17212B] shadow-2xs"
               }`}
             >
               0
@@ -332,13 +332,13 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
             <button
               onClick={handleSubmit}
               disabled={isUnlocked || isFailed || currentGuess.length !== 4}
-              className="py-3.5 rounded-xl bg-[#22C55E] hover:bg-[#22C55E]/90 text-[#090D14] font-semibold text-xs tracking-wide flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              className="py-3.5 rounded-xl bg-[#0F766E] hover:bg-[#0D655E] text-[#FFFFFF] font-semibold text-xs tracking-wide flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-xs"
             >
               <span>Submit</span>
             </button>
           </div>
 
-          <div className="text-center pt-2 text-xs text-[#718096]">
+          <div className="text-center pt-2 text-xs text-[#64748B]">
             Supports keyboard entry (0–9, Backspace, Enter)
           </div>
         </div>
@@ -350,19 +350,19 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="fixed inset-0 bg-[#090D14]/80 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            className="fixed inset-0 bg-[#090D14]/40 backdrop-blur-xs flex items-center justify-center p-4 z-50"
           >
-            <div className="bg-[#111827] border border-[#22C55E]/40 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl">
-              <div className="w-12 h-12 rounded-full bg-[#22C55E]/15 border border-[#22C55E]/30 flex items-center justify-center mx-auto mb-4 text-[#22C55E]">
+            <div className="bg-[#FFFFFF] border border-[#15803D]/40 rounded-2xl p-8 max-w-sm w-full text-center shadow-xl">
+              <div className="w-12 h-12 rounded-full bg-[#DCFCE7] text-[#15803D] flex items-center justify-center mx-auto mb-4">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-semibold text-[#F1F5F9] mb-1">
+              <h3 className="text-xl font-bold text-[#17212B] mb-1">
                 Vault Unlocked
               </h3>
-              <p className="text-sm text-[#A1AEC0] mb-4">
+              <p className="text-sm text-[#475569] mb-4">
                 Code verified in {attemptsUsed} attempt{attemptsUsed > 1 ? "s" : ""}. Core system secured!
               </p>
-              <div className="inline-block px-4 py-2 rounded-lg bg-[#22C55E]/15 border border-[#22C55E]/30 text-[#22C55E] font-mono font-semibold text-sm">
+              <div className="inline-block px-4 py-2 rounded-xl bg-[#DCFCE7] text-[#15803D] font-mono font-semibold text-sm">
                 +{getCodeScoreForAttempt(attemptsUsed)} Points Earned
               </div>
             </div>

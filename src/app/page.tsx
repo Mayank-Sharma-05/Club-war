@@ -28,6 +28,7 @@ const MAX_LIVES = 3;
 export default function Home() {
   // Navigation / Screen State
   const [screen, setScreen] = useState<GameScreen>("landing");
+  const [leaderboardReturnScreen, setLeaderboardReturnScreen] = useState<GameScreen>("landing");
   const [gamerTag, setGamerTag] = useState<string>("");
   const [sessionId, setSessionId] = useState<string>("");
 
@@ -89,7 +90,6 @@ export default function Home() {
       timerRef.current = setInterval(() => {
         setTimeRemaining((prev) => {
           if (prev <= 1) {
-            // Time expired!
             clearInterval(timerRef.current!);
             setIsTimerActive(false);
             handleGameOverDueToTime();
@@ -109,7 +109,6 @@ export default function Home() {
 
   // Reset Session / Start Fresh Game
   const resetSession = useCallback(() => {
-    // Pick random challenge set
     const randomPhishing =
       PHISHING_CHALLENGE_SETS[Math.floor(Math.random() * PHISHING_CHALLENGE_SETS.length)];
     const randomOutlier =
@@ -147,27 +146,20 @@ export default function Home() {
       const finalLives = customLives !== undefined ? customLives : lives;
       const timeSpent = TOTAL_GAME_SECONDS - timeRemaining;
 
-      // Calculate missions completed
       let completedCount = 0;
       if (activeResults.mission1.completed) completedCount++;
       if (activeResults.mission2.completed) completedCount++;
       if (activeResults.mission3.unlocked) completedCount++;
 
-      // Accuracy calculation
       let totalActions = 0;
       let correctActions = 0;
-
-      // Mission 1: 1 action + lives lost
       totalActions += 1 + activeResults.mission1.livesLost;
       if (activeResults.mission1.completed) correctActions += 1;
-
-      // Mission 2: Outliers
       totalActions +=
         activeResults.mission2.correctOutliersFound +
         activeResults.mission2.incorrectSelected;
       correctActions += activeResults.mission2.correctOutliersFound;
 
-      // Mission 3: Code
       if (activeResults.mission3.attemptsUsed > 0) {
         totalActions += activeResults.mission3.attemptsUsed;
         if (activeResults.mission3.unlocked) correctActions += 1;
@@ -177,7 +169,6 @@ export default function Home() {
         totalActions > 0 ? Math.round((correctActions / totalActions) * 100) : 0;
       const accuracy = Math.min(100, Math.max(0, rawAccuracy));
 
-      // Calculate time bonus: +2 pts per remaining second if all 3 missions completed
       let calculatedScore = score;
       if (completedCount === 3 && timeRemaining > 0) {
         calculatedScore += timeRemaining * 2;
@@ -217,7 +208,6 @@ export default function Home() {
     finalizeGameSession();
   }, [finalizeGameSession]);
 
-  // Handle wrong selection in Phishing Mission
   const handlePhishingWrong = () => {
     const nextLives = lives - 1;
     setLives(nextLives);
@@ -240,7 +230,6 @@ export default function Home() {
     }
   };
 
-  // Handle correct selection in Phishing Mission
   const handlePhishingCorrect = (scoreEarned: number, livesLost: number) => {
     const multiplier = getComboMultiplier(comboStreak + 1);
     const finalScoreEarned = Math.round(scoreEarned * multiplier);
@@ -259,13 +248,11 @@ export default function Home() {
     };
     setMissionResults(updated);
 
-    // Auto proceed to Mission 2 after short pause so player sees explanation
     setTimeout(() => {
       setScreen("mission-2");
-    }, 2400);
+    }, 2200);
   };
 
-  // Handle Outlier Mission Submit
   const handleOutlierSubmit = (
     scoreEarned: number,
     correctCount: number,
@@ -289,13 +276,11 @@ export default function Home() {
     };
     setMissionResults(updated);
 
-    // Auto proceed to Mission 3
     setTimeout(() => {
       setScreen("mission-3");
-    }, 2400);
+    }, 2200);
   };
 
-  // Handle Code Mission Complete
   const handleCodeComplete = (
     scoreEarned: number,
     attemptsUsed: number,
@@ -322,13 +307,11 @@ export default function Home() {
     };
     setMissionResults(updated);
 
-    // Finalize session and open results screen
     setTimeout(() => {
       finalizeGameSession(updated);
     }, 1200);
   };
 
-  // Flow Navigation Handlers
   const handleStartLanding = () => {
     resetSession();
     setScreen("registration");
@@ -350,16 +333,25 @@ export default function Home() {
     setScreen("registration");
   };
 
-  const handleViewLeaderboard = () => {
+  const handleViewLeaderboardFromLanding = () => {
+    setLeaderboardReturnScreen("landing");
     setScreen("leaderboard");
   };
 
-  // Calculate current achievements for Results Screen
+  const handleViewLeaderboardFromBriefing = () => {
+    setLeaderboardReturnScreen("briefing");
+    setScreen("leaderboard");
+  };
+
+  const handleViewLeaderboardFromResults = () => {
+    setLeaderboardReturnScreen("results");
+    setScreen("leaderboard");
+  };
+
   const currentAchievements = evaluateAchievements(missionResults, score, lives);
   const currentClassification = calculateClassification(score);
   const timeSpent = TOTAL_GAME_SECONDS - timeRemaining;
 
-  // Compute accuracy for live results
   let totalActions = 0;
   let correctActions = 0;
   totalActions += 1 + missionResults.mission1.livesLost;
@@ -380,7 +372,6 @@ export default function Home() {
   if (missionResults.mission2.completed) completedMissionsCount++;
   if (missionResults.mission3.unlocked) completedMissionsCount++;
 
-  // Determine current active mission ID for header
   const activeMissionId: MissionId | undefined =
     screen === "mission-1"
       ? "mission-1"
@@ -391,7 +382,7 @@ export default function Home() {
       : undefined;
 
   return (
-    <div className="min-h-screen bg-[#090D14] text-[#F1F5F9] flex flex-col font-sans select-none relative">
+    <div className="min-h-screen bg-[#F4F6F8] text-[#17212B] flex flex-col font-sans select-none relative">
       {/* Sticky Header during Active Missions */}
       {(screen === "mission-1" || screen === "mission-2" || screen === "mission-3") && (
         <GameHeader
@@ -414,7 +405,7 @@ export default function Home() {
         {screen === "landing" && (
           <LandingScreen
             onStart={handleStartLanding}
-            onViewLeaderboard={handleViewLeaderboard}
+            onViewLeaderboard={handleViewLeaderboardFromLanding}
             soundEnabled={soundEnabled}
             onToggleSound={handleToggleSound}
           />
@@ -431,6 +422,7 @@ export default function Home() {
           <MissionBriefing
             gamerTag={gamerTag}
             onInitialize={handleInitializeBriefing}
+            onViewLeaderboard={handleViewLeaderboardFromBriefing}
           />
         )}
 
@@ -469,13 +461,13 @@ export default function Home() {
             missionResults={missionResults}
             achievements={currentAchievements}
             onPlayAgain={handlePlayAgain}
-            onViewLeaderboard={handleViewLeaderboard}
+            onViewLeaderboard={handleViewLeaderboardFromResults}
           />
         )}
 
         {screen === "leaderboard" && (
           <Leaderboard
-            onBack={() => setScreen("landing")}
+            onBack={() => setScreen(leaderboardReturnScreen)}
             onNewGame={handlePlayAgain}
             highlightSessionId={sessionId}
           />

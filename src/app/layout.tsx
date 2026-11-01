@@ -26,8 +26,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${ibmPlexMono.variable} h-full dark`}>
-      <body className="min-h-full bg-[#090D14] text-[#F1F5F9] antialiased flex flex-col font-sans select-none overflow-x-hidden">
+    <html lang="en" className={`${inter.variable} ${ibmPlexMono.variable} h-full`}>
+      <body className="min-h-full bg-[#F4F6F8] text-[#17212B] antialiased flex flex-col font-sans select-none overflow-x-hidden">
         {children}
       </body>
     </html>
