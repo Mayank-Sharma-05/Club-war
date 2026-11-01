@@ -67,7 +67,7 @@ export const PhishingMission: React.FC<PhishingMissionProps> = ({
 
       {/* 2-Column by 2-Row Grid for Maximum Horizontal Readability */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
-        {challengeSet.emails.map((email) => {
+        {challengeSet.emails.map((email, idx) => {
           const isWrong = wrongCardIds.includes(email.id);
           const isRight = missionComplete && email.isPhishing;
           const status = isRight ? "correct" : isWrong ? "incorrect" : "idle";
@@ -75,6 +75,7 @@ export const PhishingMission: React.FC<PhishingMissionProps> = ({
           return (
             <EmailCard
               key={email.id}
+              index={idx}
               email={email}
               isSelected={selectedCardId === email.id}
               status={status}
