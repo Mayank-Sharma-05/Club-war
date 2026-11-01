@@ -7,6 +7,7 @@ import {
   getCodeScoreForAttempt,
 } from "./src/lib/password-engine.ts";
 import { getComboMultiplier, calculateClassification } from "./src/lib/scoring.ts";
+import { DIALOGUE_LIBRARY } from "./src/lib/chief/dialogue-library.ts";
 
 let passCount = 0;
 let failCount = 0;
@@ -121,6 +122,42 @@ assert(calculateClassification(1200) === "ELITE HACKER", "1200 = ELITE HACKER");
 assert(calculateClassification(1549) === "ELITE HACKER", "1549 = ELITE HACKER");
 assert(calculateClassification(1550) === "LEGENDARY DEFENDER", "1550 = LEGENDARY DEFENDER");
 assert(calculateClassification(1800) === "LEGENDARY DEFENDER", "1800 = LEGENDARY DEFENDER");
+
+// 9. CHIEF Interactive Dialogue Library Validation
+console.log("\n[TEST 9] CHIEF Dialogue Library Validation");
+const requiredEvents = [
+  "game_start",
+  "phishing_correct",
+  "phishing_flawless",
+  "phishing_wrong",
+  "phishing_life_lost",
+  "outlier_all_correct",
+  "outlier_partial",
+  "outlier_wrong",
+  "code_multiple_greens",
+  "code_no_match",
+  "code_last_attempt",
+  "code_unlocked",
+  "code_failed",
+  "combo_streak",
+  "timer_warning_60",
+  "timer_critical_30",
+  "game_victory",
+  "game_over_time",
+  "game_over_lives",
+  "high_score_achieved",
+  "comeback",
+];
+
+requiredEvents.forEach((evt) => {
+  const dialogues = DIALOGUE_LIBRARY[evt];
+  assert(Array.isArray(dialogues) && dialogues.length >= 2, `Event "${evt}" has >= 2 dialogue variations (${dialogues?.length || 0})`);
+  dialogues?.forEach((d) => {
+    assert(d.id.length > 0, `Dialogue ID exists: ${d.id}`);
+    assert(d.text.length >= 10, `Dialogue has natural spoken text: "${d.text.slice(0, 30)}..."`);
+    assert(typeof d.priority === "number" && d.priority >= 1, `Dialogue priority valid: ${d.priority}`);
+  });
+});
 
 console.log(`\n========================================`);
 console.log(`TEST RESULTS: ${passCount} PASSED, ${failCount} FAILED`);

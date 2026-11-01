@@ -10,11 +10,13 @@ import { sound } from "@/lib/sound-engine";
 interface CodeMissionProps {
   secretCode: string;
   onComplete: (scoreEarned: number, attemptsUsed: number, unlocked: boolean) => void;
+  onGuessEvaluated?: (greens: number, yellows: number, attemptNumber: number) => void;
 }
 
 export const CodeMission: React.FC<CodeMissionProps> = ({
   secretCode,
   onComplete,
+  onGuessEvaluated,
 }) => {
   const [currentGuess, setCurrentGuess] = useState<string>("");
   const [history, setHistory] = useState<GuessRecord[]>([]);
@@ -65,6 +67,12 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
     setCurrentGuess("");
 
     const isAllGreen = feedback.every((f) => f === "green");
+    const greenCount = feedback.filter((f) => f === "green").length;
+    const yellowCount = feedback.filter((f) => f === "yellow").length;
+
+    if (onGuessEvaluated) {
+      onGuessEvaluated(greenCount, yellowCount, newHistory.length);
+    }
 
     if (isAllGreen) {
       sound.playVaultUnlock();

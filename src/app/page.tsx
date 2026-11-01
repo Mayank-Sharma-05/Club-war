@@ -7,8 +7,9 @@ import { OUTLIER_DATASETS } from "@/lib/outlier-data";
 import { generateUniquePassword } from "@/lib/password-engine";
 import { getComboMultiplier, calculateClassification } from "@/lib/scoring";
 import { evaluateAchievements } from "@/lib/achievements";
-import { saveLeaderboardEntry, getGameSettings, saveGameSettings } from "@/lib/storage";
+import { saveLeaderboardEntry, getGameSettings, saveGameSettings, getLeaderboard } from "@/lib/storage";
 import { sound } from "@/lib/sound-engine";
+import { chiefSpeech } from "@/lib/chief/speech-manager";
 
 // UI Components
 import { GameHeader } from "@/components/game/GameHeader";
@@ -21,6 +22,7 @@ import { CodeMission } from "@/components/game/CodeMission";
 import { ResultsScreen } from "@/components/game/ResultsScreen";
 import { Leaderboard } from "@/components/game/Leaderboard";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
+import { ChiefWidget } from "@/components/chief/ChiefWidget";
 
 const TOTAL_GAME_SECONDS = 180;
 const MAX_LIVES = 3;
@@ -45,6 +47,11 @@ export default function Home() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
 
+  // Track timer alerts to avoid duplicate voice triggers
+  const hasTriggered60WarnRef = useRef(false);
+  const hasTriggered30WarnRef = useRef(false);
+  const lastAlertTimeRef = useRef<number | null>(null);
+
   // Challenges for active session
   const [currentPhishingSet, setCurrentPhishingSet] = useState<PhishingChallengeSet>(PHISHING_CHALLENGE_SETS[0]);
   const [currentOutlierSet, setCurrentOutlierSet] = useState<OutlierDataset>(OUTLIER_DATASETS[0]);
@@ -59,11 +66,12 @@ export default function Home() {
 
   const [hasRecordedScore, setHasRecordedScore] = useState<boolean>(false);
 
-  // Initialize Sound and Settings on mount
+  // Initialize Sound, Speech, and Settings on mount
   useEffect(() => {
     const settings = getGameSettings();
     setSoundEnabled(settings.soundEnabled);
     sound.setMuted(!settings.soundEnabled);
+    chiefSpeech.initVoices();
   }, []);
 
   const handleToggleSound = () => {
@@ -73,13 +81,23 @@ export default function Home() {
     saveGameSettings({ soundEnabled: nextState });
   };
 
-  // Sound alert at 30 seconds
-  const lastAlertTimeRef = useRef<number | null>(null);
+  // Timer warnings and sound alert at 30 seconds
   useEffect(() => {
     if (isTimerActive && timeRemaining <= 30 && timeRemaining > 0) {
       if (lastAlertTimeRef.current !== timeRemaining) {
         lastAlertTimeRef.current = timeRemaining;
         sound.playCountdownAlert();
+      }
+    }
+
+    if (isTimerActive) {
+      if (timeRemaining === 60 && !hasTriggered60WarnRef.current) {
+        hasTriggered60WarnRef.current = true;
+        chiefSpeech.trigger("timer_warning_60");
+      }
+      if (timeRemaining === 30 && !hasTriggered30WarnRef.current) {
+        hasTriggered30WarnRef.current = true;
+        chiefSpeech.trigger("timer_critical_30");
       }
     }
   }, [isTimerActive, timeRemaining]);
@@ -109,6 +127,10 @@ export default function Home() {
 
   // Reset Session / Start Fresh Game
   const resetSession = useCallback(() => {
+    chiefSpeech.cancelSpeech();
+    hasTriggered60WarnRef.current = false;
+    hasTriggered30WarnRef.current = false;
+
     const randomPhishing =
       PHISHING_CHALLENGE_SETS[Math.floor(Math.random() * PHISHING_CHALLENGE_SETS.length)];
     const randomOutlier =
@@ -179,6 +201,14 @@ export default function Home() {
       const achievements = evaluateAchievements(activeResults, calculatedScore, finalLives);
       const unlockedBadges = achievements.filter((a) => a.unlocked).map((a) => a.title);
 
+      // Check current leaderboard for high score
+      const currentEntries = getLeaderboard();
+      const previousHighScore =
+        currentEntries.length > 0 ? Math.max(...currentEntries.map((e) => e.score)) : 0;
+
+      const isNewHighScore =
+        currentEntries.length > 0 && calculatedScore > previousHighScore;
+
       const entry: LeaderboardEntry = {
         id: sessionId || `session-${Date.now()}`,
         gamerTag: gamerTag || "ANALYST",
@@ -199,12 +229,22 @@ export default function Home() {
       saveLeaderboardEntry(entry);
       setHasRecordedScore(true);
       setScreen("results");
+
+      // CHIEF commentary reaction
+      setTimeout(() => {
+        if (isNewHighScore) {
+          chiefSpeech.trigger("high_score_achieved");
+        } else if (completedCount === 3) {
+          chiefSpeech.trigger("game_victory");
+        }
+      }, 500);
     },
     [hasRecordedScore, missionResults, lives, timeRemaining, score, sessionId, gamerTag]
   );
 
   const handleGameOverDueToTime = useCallback(() => {
     sound.playGameOver();
+    chiefSpeech.trigger("game_over_time");
     finalizeGameSession();
   }, [finalizeGameSession]);
 
@@ -215,6 +255,7 @@ export default function Home() {
 
     if (nextLives <= 0) {
       sound.playGameOver();
+      chiefSpeech.trigger("game_over_lives");
       const updated = {
         ...missionResults,
         mission1: {
@@ -227,6 +268,8 @@ export default function Home() {
       };
       setMissionResults(updated);
       finalizeGameSession(updated, 0);
+    } else {
+      chiefSpeech.trigger("phishing_wrong");
     }
   };
 
@@ -248,9 +291,16 @@ export default function Home() {
     };
     setMissionResults(updated);
 
+    // CHIEF commentary
+    if (livesLost === 0) {
+      chiefSpeech.trigger("phishing_flawless");
+    } else {
+      chiefSpeech.trigger("phishing_correct");
+    }
+
     setTimeout(() => {
       setScreen("mission-2");
-    }, 2200);
+    }, 2400);
   };
 
   const handleOutlierSubmit = (
@@ -276,9 +326,36 @@ export default function Home() {
     };
     setMissionResults(updated);
 
+    // CHIEF commentary with context awareness
+    if (correctCount === currentOutlierSet.targetOutlierCount && incorrectCount === 0) {
+      if (missionResults.mission1.livesLost > 0) {
+        chiefSpeech.trigger("comeback");
+      } else {
+        chiefSpeech.trigger("outlier_all_correct");
+      }
+    } else if (correctCount > 0) {
+      chiefSpeech.trigger("outlier_partial");
+    } else {
+      chiefSpeech.trigger("outlier_wrong");
+    }
+
     setTimeout(() => {
       setScreen("mission-3");
-    }, 2200);
+    }, 2400);
+  };
+
+  const handleCodeGuessEvaluated = (
+    greens: number,
+    yellows: number,
+    attemptNumber: number
+  ) => {
+    if (attemptNumber === 4 && greens < 4) {
+      chiefSpeech.trigger("code_last_attempt");
+    } else if (greens >= 2 && greens < 4) {
+      chiefSpeech.trigger("code_multiple_greens");
+    } else if (greens === 0 && yellows === 0) {
+      chiefSpeech.trigger("code_no_match");
+    }
   };
 
   const handleCodeComplete = (
@@ -292,8 +369,10 @@ export default function Home() {
     setScore((prev) => prev + finalScoreEarned);
     if (unlocked) {
       setComboStreak((prev) => prev + 1);
+      chiefSpeech.trigger("code_unlocked");
     } else {
       setComboStreak(0);
+      chiefSpeech.trigger("code_failed");
     }
 
     const updated = {
@@ -326,6 +405,7 @@ export default function Home() {
     startTimeRef.current = Date.now();
     setIsTimerActive(true);
     setScreen("mission-1");
+    chiefSpeech.trigger("game_start");
   };
 
   const handlePlayAgain = () => {
@@ -380,6 +460,13 @@ export default function Home() {
       : screen === "mission-3"
       ? "mission-3"
       : undefined;
+
+  // Show CHIEF widget on active missions and results screens
+  const showChiefWidget =
+    screen === "mission-1" ||
+    screen === "mission-2" ||
+    screen === "mission-3" ||
+    screen === "results";
 
   return (
     <div className="min-h-screen bg-[#F4F6F8] text-[#17212B] flex flex-col font-sans select-none relative">
@@ -446,6 +533,7 @@ export default function Home() {
           <CodeMission
             secretCode={secretVaultCode}
             onComplete={handleCodeComplete}
+            onGuessEvaluated={handleCodeGuessEvaluated}
           />
         )}
 
@@ -473,6 +561,9 @@ export default function Home() {
           />
         )}
       </main>
+
+      {/* Persistent CHIEF Interactive Companion Widget */}
+      {showChiefWidget && <ChiefWidget />}
 
       {/* Stall Operator Admin Modal */}
       <AdminDashboard
