@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { UserCheck, ArrowRight, AlertCircle, Shield } from "lucide-react";
+import { ArrowRight, AlertCircle, Shield } from "lucide-react";
 import { sound } from "@/lib/sound-engine";
 
 interface PlayerRegistrationProps {
@@ -40,23 +40,23 @@ export const PlayerRegistration: React.FC<PlayerRegistrationProps> = ({
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[#F4F6F8] bg-light-pattern">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[#F8FAFC] bg-light-pattern">
       <motion.div
-        initial={{ opacity: 0, y: 15 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="w-full max-w-md bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-sm"
+        transition={{ duration: 0.25 }}
+        className="w-full max-w-md bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-sm"
       >
         {/* Header */}
-        <div className="flex items-center space-x-3 pb-4 mb-6 border-b border-[#E2E8F0]">
-          <div className="w-9 h-9 rounded-xl bg-[#0F766E]/10 flex items-center justify-center text-[#0F766E]">
+        <div className="flex items-center space-x-3 pb-4 mb-6 border-b border-slate-100">
+          <div className="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-700">
             <Shield className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold tracking-tight text-[#17212B]">
+            <h2 className="text-lg font-heading font-semibold tracking-tight text-slate-900">
               Analyst Registration
             </h2>
-            <p className="text-xs text-[#64748B]">
+            <p className="text-xs text-slate-500 font-sans">
               Enter your callsign for tournament score tracking
             </p>
           </div>
@@ -64,8 +64,8 @@ export const PlayerRegistration: React.FC<PlayerRegistrationProps> = ({
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-xs font-semibold text-[#475569] mb-2">
-              Gamer Tag / Callsign (Max 16 characters)
+            <label className="block text-xs font-medium text-slate-700 mb-2">
+              Callsign / Gamer Tag (Max 16 characters)
             </label>
             <input
               type="text"
@@ -77,10 +77,10 @@ export const PlayerRegistration: React.FC<PlayerRegistrationProps> = ({
                 if (error) setError(null);
               }}
               placeholder="e.g. Sentinel_42"
-              className="w-full px-4 py-3 bg-[#FFFFFF] border border-[#CBD5E1] focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] focus:outline-none rounded-xl text-[#17212B] font-mono text-sm tracking-wide placeholder:text-[#94A3B8] transition-colors"
+              className="w-full px-4 py-2.5 bg-white border border-slate-300 focus:border-teal-700 focus:ring-1 focus:ring-teal-700 focus:outline-none rounded-xl text-slate-900 font-mono text-sm placeholder:text-slate-400 transition-colors"
             />
             {error && (
-              <div className="flex items-center space-x-1.5 text-xs text-[#DC2626] mt-2">
+              <div className="flex items-center space-x-1.5 text-xs text-rose-600 mt-2">
                 <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                 <span>{error}</span>
               </div>
@@ -94,7 +94,7 @@ export const PlayerRegistration: React.FC<PlayerRegistrationProps> = ({
                 sound.playClick();
                 onBack();
               }}
-              className="w-full sm:w-1/3 py-2.5 rounded-xl bg-[#FFFFFF] border border-[#CBD5E1] hover:border-[#94A3B8] text-xs font-semibold text-[#475569] hover:text-[#17212B] transition-colors cursor-pointer"
+              className="w-full sm:w-1/3 py-2.5 rounded-xl bg-white border border-slate-300 hover:border-slate-400 text-xs font-medium text-slate-700 hover:text-slate-900 transition-colors cursor-pointer"
             >
               Back
             </button>
@@ -102,7 +102,7 @@ export const PlayerRegistration: React.FC<PlayerRegistrationProps> = ({
             <button
               disabled={isSubmitting || !tag.trim()}
               type="submit"
-              className="w-full sm:w-2/3 py-2.5 rounded-xl bg-[#0F766E] hover:bg-[#0D655E] text-[#FFFFFF] font-semibold text-xs tracking-wide flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-xs"
+              className="w-full sm:w-2/3 py-2.5 rounded-xl bg-[#0F766E] hover:bg-[#0D655E] text-white font-medium text-xs flex items-center justify-center space-x-1.5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-xs"
             >
               <span>Confirm Callsign</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -110,8 +110,8 @@ export const PlayerRegistration: React.FC<PlayerRegistrationProps> = ({
           </div>
         </form>
 
-        <div className="mt-6 pt-4 border-t border-[#E2E8F0] text-center text-xs text-[#64748B]">
-          Scores are saved locally to this laptop tournament station.
+        <div className="mt-6 pt-4 border-t border-slate-100 text-center text-xs text-slate-500">
+          Scores are saved locally to this tournament station.
         </div>
       </motion.div>
     </div>

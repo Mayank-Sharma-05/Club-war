@@ -15,7 +15,6 @@ import {
   X,
   Play,
   Sparkles,
-  Cpu,
   Info,
 } from "lucide-react";
 
@@ -118,7 +117,7 @@ export const ChiefWidget: React.FC = () => {
         {/* Companion Control Dock */}
         <motion.div
           layout
-          className="pointer-events-auto flex items-center space-x-2 bg-[#FFFFFF] border border-[#CBD5E1] rounded-2xl p-1.5 sm:p-2 shadow-md transition-shadow hover:shadow-lg"
+          className="pointer-events-auto flex items-center space-x-2 bg-white border border-slate-200 rounded-2xl p-1.5 sm:p-2 shadow-sm transition-shadow hover:shadow-md"
         >
           {/* Avatar button: click to replay or expand */}
           <button
@@ -135,8 +134,8 @@ export const ChiefWidget: React.FC = () => {
             <ChiefAvatar emotion={emotion} isSpeaking={isSpeaking} size={isMinimized ? 38 : 42} />
             {isSpeaking && (
               <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0F766E] opacity-75" />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-[#0F766E]" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-600 opacity-75" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-teal-600" />
               </span>
             )}
           </button>
@@ -145,16 +144,16 @@ export const ChiefWidget: React.FC = () => {
           {!isMinimized && (
             <div className="pr-1 pl-0.5">
               <div className="flex items-center space-x-1.5">
-                <span className="text-xs font-bold text-[#17212B]">CHIEF</span>
-                <span className="text-[10px] text-[#0F766E] font-semibold bg-[#0F766E]/10 px-1.5 py-0.2 rounded font-mono">
+                <span className="text-xs font-semibold text-slate-900 font-sans">CHIEF</span>
+                <span className="text-[10px] text-teal-700 font-medium bg-teal-50 border border-teal-100 px-1.5 py-0.2 rounded-md font-sans">
                   {activeEngine === "elevenlabs" && elevenLabsConfigured
-                    ? "ELEVENLABS AI"
-                    : "VOICE OPS"}
+                    ? "ElevenLabs AI"
+                    : "Voice Ops"}
                 </span>
               </div>
-              <div className="text-[11px] text-[#64748B] font-medium truncate max-w-[130px]">
+              <div className="text-[11px] text-slate-500 font-sans truncate max-w-[130px]">
                 {isSpeaking ? (
-                  <span className="text-[#0F766E] font-semibold">Speaking...</span>
+                  <span className="text-teal-700 font-medium">Speaking...</span>
                 ) : (
                   <span>Ready & monitoring</span>
                 )}
@@ -163,17 +162,17 @@ export const ChiefWidget: React.FC = () => {
           )}
 
           {/* Action buttons */}
-          <div className="flex items-center space-x-0.5 border-l border-[#E2E8F0] pl-1.5">
+          <div className="flex items-center space-x-0.5 border-l border-slate-200 pl-1.5">
             {/* Quick Mute Toggle */}
             <button
               onClick={() => setVoiceEnabled(!voiceEnabled)}
               title={voiceEnabled ? "Mute CHIEF voice" : "Unmute CHIEF voice"}
-              className="p-1.5 rounded-lg text-[#64748B] hover:text-[#17212B] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
             >
               {voiceEnabled ? (
-                <Volume2 className="w-4 h-4 text-[#0F766E]" />
+                <Volume2 className="w-4 h-4 text-teal-700" />
               ) : (
-                <VolumeX className="w-4 h-4 text-[#DC2626]" />
+                <VolumeX className="w-4 h-4 text-rose-600" />
               )}
             </button>
 
@@ -182,7 +181,7 @@ export const ChiefWidget: React.FC = () => {
               <button
                 onClick={() => setIsSettingsOpen(true)}
                 title="CHIEF Voice & Text Settings"
-                className="p-1.5 rounded-lg text-[#64748B] hover:text-[#17212B] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 <Settings className="w-4 h-4" />
               </button>
@@ -192,7 +191,7 @@ export const ChiefWidget: React.FC = () => {
             <button
               onClick={() => setIsMinimized(!isMinimized)}
               title={isMinimized ? "Expand CHIEF widget" : "Minimize CHIEF widget"}
-              className="p-1.5 rounded-lg text-[#64748B] hover:text-[#17212B] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
             >
               {isMinimized ? (
                 <ChevronUp className="w-4 h-4" />
@@ -207,121 +206,103 @@ export const ChiefWidget: React.FC = () => {
       {/* CHIEF Stall-Ready Settings Modal */}
       <AnimatePresence>
         {isSettingsOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#070B14]/40 backdrop-blur-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="w-full max-w-md bg-[#FFFFFF] border border-[#CBD5E1] rounded-2xl p-6 shadow-2xl text-[#17212B]"
+              className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 shadow-xl text-slate-900"
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#E2E8F0]">
+              <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
                 <div className="flex items-center space-x-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-[#0F766E]/10 flex items-center justify-center text-[#0F766E]">
+                  <div className="w-8 h-8 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-700">
                     <Sparkles className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-base text-[#17212B]">
-                      CHIEF Voice Operations
+                    <h3 className="font-heading font-semibold text-base text-slate-900">
+                      CHIEF Voice Settings
                     </h3>
-                    <p className="text-xs text-[#64748B]">
-                      ElevenLabs AI voice & speech synthesis configuration
+                    <p className="text-xs text-slate-500 font-sans">
+                      Cyber Operations Game Commander
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsSettingsOpen(false)}
-                  className="p-1.5 rounded-lg text-[#64748B] hover:text-[#17212B] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* Settings Controls */}
-              <div className="space-y-4 text-xs">
-                {/* Voice Engine Status Banner */}
-                <div className="p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center space-x-1.5">
-                      <Cpu className="w-3.5 h-3.5 text-[#0F766E]" />
-                      <span className="font-semibold text-xs text-[#17212B]">
-                        Active Voice Engine
-                      </span>
-                    </div>
-                    {elevenLabsConfigured ? (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#DCFCE7] text-[#15803D] border border-[#15803D]/20">
-                        ElevenLabs AI (Adam)
-                      </span>
-                    ) : (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#F1F5F9] text-[#64748B] border border-[#CBD5E1]">
-                        Browser Speech Fallback
-                      </span>
-                    )}
+              {/* Engine Status Banner */}
+              <div className="mb-4 p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-start space-x-2.5 font-sans">
+                <Info className="w-4 h-4 text-teal-700 shrink-0 mt-0.5" />
+                <div className="text-xs">
+                  <div className="font-medium text-slate-800">
+                    Active Voice Engine:{" "}
+                    <span className="text-teal-700 font-semibold">
+                      {activeEngine === "elevenlabs" && elevenLabsConfigured
+                        ? "ElevenLabs AI Voice"
+                        : "Browser SpeechSynthesis"}
+                    </span>
                   </div>
-                  <p className="text-[11px] text-[#64748B] leading-relaxed">
-                    {elevenLabsConfigured
-                      ? "High-fidelity AI voice with deep, confident male commander personality and dynamic emotional inflection."
-                      : "Using local browser SpeechSynthesis. Add ELEVENLABS_API_KEY in .env.local to activate the expressive ElevenLabs AI commander voice."}
-                  </p>
+                  <div className="text-slate-500 mt-0.5">
+                    {activeEngine === "elevenlabs" && elevenLabsConfigured
+                      ? "Natural expressive male commander voice stream active."
+                      : "Native OS neural/synthesized English voice fallback."}
+                  </div>
                 </div>
+              </div>
 
-                {/* 1. Voice ON/OFF */}
-                <div className="flex items-center justify-between py-2 border-b border-[#F1F5F9]">
+              {/* Settings Controls */}
+              <div className="space-y-4 text-xs font-sans">
+                {/* Voice Toggle */}
+                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
                   <div>
-                    <span className="font-semibold text-sm text-[#17212B] block">
-                      CHIEF Voice Output
-                    </span>
-                    <span className="text-[#64748B] text-[11px]">
-                      Enable spoken audio commentary during missions
-                    </span>
+                    <div className="font-medium text-slate-800">Speech Audio</div>
+                    <div className="text-slate-500 text-[11px]">
+                      Enable spoken reactions and commentary
+                    </div>
                   </div>
                   <button
                     onClick={() => setVoiceEnabled(!voiceEnabled)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
-                      voiceEnabled ? "bg-[#0F766E]" : "bg-[#CBD5E1]"
+                    className={`px-3 py-1.5 rounded-lg font-medium text-xs transition-colors cursor-pointer ${
+                      voiceEnabled
+                        ? "bg-teal-700 text-white"
+                        : "bg-slate-200 text-slate-600"
                     }`}
                   >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        voiceEnabled ? "translate-x-6" : "translate-x-1"
-                      }`}
-                    />
+                    {voiceEnabled ? "Enabled" : "Muted"}
                   </button>
                 </div>
 
-                {/* 2. Show CHIEF Text ON/OFF */}
-                <div className="flex items-center justify-between py-2 border-b border-[#F1F5F9]">
+                {/* Subtitles Toggle */}
+                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
                   <div>
-                    <span className="font-semibold text-sm text-[#17212B] block">
-                      Show Dialogue Bubble
-                    </span>
-                    <span className="text-[#64748B] text-[11px]">
-                      Display written speech bubble on screen
-                    </span>
+                    <div className="font-medium text-slate-800">Subtitles / Speech Bubble</div>
+                    <div className="text-slate-500 text-[11px]">
+                      Show text popups alongside speech
+                    </div>
                   </div>
                   <button
                     onClick={() => setShowText(!showText)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
-                      showText ? "bg-[#0F766E]" : "bg-[#CBD5E1]"
+                    className={`px-3 py-1.5 rounded-lg font-medium text-xs transition-colors cursor-pointer ${
+                      showText
+                        ? "bg-teal-700 text-white"
+                        : "bg-slate-200 text-slate-600"
                     }`}
                   >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        showText ? "translate-x-6" : "translate-x-1"
-                      }`}
-                    />
+                    {showText ? "Visible" : "Hidden"}
                   </button>
                 </div>
 
-                {/* 3. Voice Volume Slider */}
-                <div className="py-2 border-b border-[#F1F5F9]">
-                  <div className="flex justify-between items-center mb-1.5">
-                    <span className="font-semibold text-[#17212B]">
-                      Voice Volume
-                    </span>
-                    <span className="font-mono text-[11px] text-[#0F766E] font-bold">
-                      {Math.round(volume * 100)}%
-                    </span>
+                {/* Volume Slider */}
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-slate-800">Commander Volume</span>
+                    <span className="font-mono text-slate-600">{Math.round(volume * 100)}%</span>
                   </div>
                   <input
                     type="range"
@@ -330,62 +311,50 @@ export const ChiefWidget: React.FC = () => {
                     step="0.05"
                     value={volume}
                     onChange={(e) => setVolume(parseFloat(e.target.value))}
-                    className="w-full accent-[#0F766E] cursor-pointer"
+                    className="w-full accent-teal-700 cursor-pointer"
                   />
                 </div>
 
-                {/* 4. Fallback Browser Voice Selection */}
-                <div className="py-2 border-b border-[#F1F5F9]">
-                  <label className="font-semibold text-[#17212B] block mb-1">
-                    Browser Fallback Voice (Offline / Backup)
-                  </label>
-                  <p className="text-[11px] text-[#64748B] mb-2">
-                    Used if ElevenLabs AI is offline or unkeyed:
-                  </p>
-                  <select
-                    value={selectedURI || ""}
-                    onChange={(e) => {
-                      setSelectedURI(e.target.value);
-                      setPreferredVoice(e.target.value);
-                    }}
-                    className="w-full bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl px-3 py-2 text-xs text-[#17212B] focus:outline-none focus:border-[#0F766E]"
-                  >
-                    <option value="">
-                      Auto Male ({selectedVoiceName || "Detecting..."})
-                    </option>
-                    {englishVoices.map((v) => (
-                      <option key={v.voiceURI} value={v.voiceURI}>
-                        {v.name} [{getVoiceTag(v)}]
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* 5. Action Buttons: Preview Voice & Replay Last */}
-                <div className="flex items-center space-x-2 pt-2">
-                  <button
-                    onClick={testVoice}
-                    className="flex-1 py-2.5 px-3 bg-[#0F766E] hover:bg-[#0D655E] text-[#FFFFFF] font-semibold rounded-xl flex items-center justify-center space-x-1.5 transition-colors cursor-pointer shadow-xs"
-                  >
-                    <Play className="w-3.5 h-3.5 fill-white" />
-                    <span>Preview Voice</span>
-                  </button>
-
-                  <button
-                    onClick={replayLast}
-                    className="py-2.5 px-3 bg-[#FFFFFF] hover:bg-[#F8FAFC] border border-[#CBD5E1] text-[#475569] font-semibold rounded-xl flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Replay Last</span>
-                  </button>
-                </div>
+                {/* Browser Fallback Voice Selector (if using browser engine) */}
+                {englishVoices.length > 0 && (
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                    <label className="block font-medium text-slate-800">
+                      Fallback Voice (SpeechSynthesis)
+                    </label>
+                    <select
+                      value={selectedURI}
+                      onChange={(e) => {
+                        setSelectedURI(e.target.value);
+                        setPreferredVoice(e.target.value);
+                      }}
+                      className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-teal-700"
+                    >
+                      {englishVoices.map((v) => (
+                        <option key={v.voiceURI} value={v.voiceURI}>
+                          {v.name} ({getVoiceTag(v)})
+                        </option>
+                      ))}
+                    </select>
+                    <div className="text-[11px] text-slate-500">
+                      Current selection: {selectedVoiceName || "Default system voice"}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Close footer */}
-              <div className="mt-5 pt-3 border-t border-[#E2E8F0] flex justify-end">
+              {/* Action Buttons */}
+              <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100 font-sans">
+                <button
+                  onClick={testVoice}
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-medium flex items-center space-x-1.5 transition-colors cursor-pointer"
+                >
+                  <Play className="w-3.5 h-3.5" />
+                  <span>Test Voice</span>
+                </button>
+
                 <button
                   onClick={() => setIsSettingsOpen(false)}
-                  className="px-5 py-2 bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#17212B] font-semibold rounded-xl text-xs transition-colors cursor-pointer"
+                  className="px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-medium transition-colors cursor-pointer shadow-xs"
                 >
                   Done
                 </button>

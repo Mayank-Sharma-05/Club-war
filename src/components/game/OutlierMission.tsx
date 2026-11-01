@@ -75,34 +75,34 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
   return (
     <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-6 pb-36 flex flex-col flex-grow">
       {/* Mission Subheader */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-6 border-b border-[#E2E8F0] gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-6 border-b border-slate-200 gap-3">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-semibold text-[#4F46E5] uppercase tracking-wider mb-1">
-            <BarChart2 className="w-4 h-4 text-[#4F46E5]" />
-            <span>Mission 02 — Layer 2 Telemetry</span>
+          <div className="flex items-center space-x-2 text-xs font-semibold text-indigo-700 mb-1">
+            <BarChart2 className="w-4 h-4 text-indigo-700" />
+            <span>Mission 02 — Telemetry Anomaly</span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-[#17212B] tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-heading font-bold text-slate-900 tracking-tight">
             Outlier Hunt: {dataset.title}
           </h2>
-          <p className="text-sm text-[#475569] mt-1">{dataset.metricDescription}</p>
+          <p className="text-sm font-sans text-slate-600 mt-1">{dataset.metricDescription}</p>
         </div>
 
         {/* Selection Status Badge (Does NOT reveal target anomaly count) */}
-        <div className="inline-flex items-center space-x-2.5 bg-[#FFFFFF] px-4 py-2 rounded-xl border border-[#E2E8F0] self-start sm:self-auto shadow-xs">
-          <span className="text-xs font-medium text-[#64748B]">Selected:</span>
-          <span className="text-xs font-mono font-bold text-[#4F46E5]">
+        <div className="inline-flex items-center space-x-2.5 bg-white px-4 py-2 rounded-xl border border-slate-200 self-start sm:self-auto shadow-2xs font-sans">
+          <span className="text-xs font-medium text-slate-500">Selected:</span>
+          <span className="text-xs font-mono font-semibold text-indigo-700">
             {selectedIndices.length} {selectedIndices.length === 1 ? "value" : "values"}
           </span>
         </div>
       </div>
 
       {/* Main Dataset Card */}
-      <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-xs mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 pb-3 border-b border-[#E2E8F0] gap-2">
-          <span className="text-sm font-semibold text-[#17212B]">
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-2xs mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 pb-3 border-b border-slate-100 gap-2 font-sans">
+          <span className="text-sm font-semibold text-slate-900">
             Observation Samples ({dataset.unit})
           </span>
-          <span className="text-xs text-[#64748B] font-medium">
+          <span className="text-xs text-slate-500">
             Examine the dataset and select the values that deviate significantly from the normal pattern.
           </span>
         </div>
@@ -113,20 +113,20 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
             const isSelected = selectedIndices.includes(idx);
             const isActualOutlier = dataset.outlierIndices.includes(idx);
 
-            let borderStyle = "border-[#E2E8F0] bg-[#F8FAFC] text-[#17212B] hover:border-[#CBD5E1] hover:bg-[#FFFFFF]";
+            let borderStyle = "border-slate-200 bg-slate-50/70 text-slate-900 hover:border-slate-300 hover:bg-white";
 
             if (isEvaluated) {
               if (isSelected && isActualOutlier) {
-                borderStyle = "border-[#15803D] bg-[#DCFCE7] text-[#15803D] ring-2 ring-[#15803D]/20";
+                borderStyle = "border-emerald-500 bg-emerald-50 text-emerald-800 ring-2 ring-emerald-500/20";
               } else if (isSelected && !isActualOutlier) {
-                borderStyle = "border-[#DC2626] bg-[#FEE2E2] text-[#DC2626] ring-2 ring-[#DC2626]/20";
+                borderStyle = "border-rose-400 bg-rose-50 text-rose-800 ring-2 ring-rose-400/20";
               } else if (!isSelected && isActualOutlier) {
-                borderStyle = "border-[#D97706] bg-[#FEF3C7] text-[#D97706]";
+                borderStyle = "border-amber-400 bg-amber-50 text-amber-800";
               } else {
-                borderStyle = "border-[#E2E8F0]/60 bg-[#F8FAFC]/50 text-[#94A3B8]";
+                borderStyle = "border-slate-200/60 bg-slate-50/40 text-slate-400";
               }
             } else if (isSelected) {
-              borderStyle = "border-[#4F46E5] bg-[#EEF2FF] text-[#4F46E5] ring-2 ring-[#4F46E5]/20";
+              borderStyle = "border-indigo-600 bg-indigo-50/70 text-indigo-900 ring-2 ring-indigo-600/20";
             }
 
             return (
@@ -138,14 +138,14 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
                 className={`relative flex flex-col items-center justify-between p-4 rounded-xl border transition-all cursor-pointer h-24 ${borderStyle}`}
               >
                 {/* Observation label */}
-                <span className="text-[11px] font-mono text-[#64748B] self-start">
+                <span className="text-[11px] font-mono text-slate-400 self-start">
                   #{String(idx + 1).padStart(2, "0")}
                 </span>
 
                 {/* Primary Number Display */}
                 <div className="font-mono font-bold text-xl tracking-tight my-auto">
                   {val}
-                  <span className="text-xs text-[#64748B] ml-1 font-normal">
+                  <span className="text-xs text-slate-500 ml-1 font-normal font-sans">
                     {dataset.unit}
                   </span>
                 </div>
@@ -154,13 +154,13 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
                 {isEvaluated && (
                   <div className="absolute top-2 right-2">
                     {isSelected && isActualOutlier && (
-                      <CheckCircle2 className="w-4 h-4 text-[#15803D]" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     )}
                     {isSelected && !isActualOutlier && (
-                      <XCircle className="w-4 h-4 text-[#DC2626]" />
+                      <XCircle className="w-4 h-4 text-rose-600" />
                     )}
                     {!isSelected && isActualOutlier && (
-                      <AlertCircle className="w-4 h-4 text-[#D97706]" />
+                      <AlertCircle className="w-4 h-4 text-amber-600" />
                     )}
                   </div>
                 )}
@@ -171,16 +171,16 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
 
         {/* Action Row */}
         {!isEvaluated ? (
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#E2E8F0]">
-            <div className="flex items-center space-x-2 text-xs text-[#64748B]">
-              <Info className="w-4 h-4 text-[#4F46E5] shrink-0" />
-              <span>Analyze the observations and select the values that deviate significantly from the baseline.</span>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-100">
+            <div className="flex items-center space-x-2 text-xs text-slate-500 font-sans">
+              <Info className="w-4 h-4 text-indigo-700 shrink-0" />
+              <span>Select all abnormal data points, then click Submit Analysis.</span>
             </div>
 
             <button
               onClick={handleSubmit}
               disabled={selectedIndices.length === 0}
-              className="w-full sm:w-auto px-7 py-3 rounded-xl bg-[#0F766E] hover:bg-[#0D655E] text-[#FFFFFF] font-semibold text-xs tracking-wide flex items-center justify-center space-x-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-sm"
+              className="w-full sm:w-auto px-7 py-2.5 rounded-xl bg-[#0F766E] hover:bg-[#0D655E] text-white font-medium text-xs flex items-center justify-center space-x-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-xs hover:shadow"
             >
               <span>Submit Analysis</span>
             </button>
@@ -192,43 +192,43 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
       <AnimatePresence>
         {isEvaluated && evaluationResult && (
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`w-full bg-[#FFFFFF] border rounded-2xl p-6 shadow-sm ${
+            className={`w-full bg-white border rounded-2xl p-6 shadow-sm ${
               evaluationResult.allFound
-                ? "border-[#15803D]/40"
-                : "border-[#4F46E5]/40"
+                ? "border-emerald-300"
+                : "border-indigo-300"
             }`}
           >
             <div className="flex items-start space-x-4">
-              <div className="p-3 rounded-xl bg-[#EEF2FF] text-[#4F46E5] shrink-0 mt-0.5">
+              <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 shrink-0 mt-0.5">
                 <BarChart2 className="w-6 h-6" />
               </div>
               <div className="flex-grow">
-                <div className="flex items-center space-x-2.5 mb-1.5">
-                  <span className="text-xs font-bold text-[#4F46E5] uppercase tracking-wider">
+                <div className="flex items-center space-x-2.5 mb-1.5 flex-wrap gap-y-1">
+                  <span className="text-xs font-semibold text-indigo-700">
                     Telemetry Analysis Complete
                   </span>
                   <span
-                    className={`px-2.5 py-0.5 rounded text-xs font-mono font-semibold ${
+                    className={`px-2 py-0.5 rounded text-xs font-mono font-medium ${
                       evaluationResult.score > 0
-                        ? "bg-[#DCFCE7] text-[#15803D]"
-                        : "bg-[#FEE2E2] text-[#DC2626]"
+                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                        : "bg-rose-50 text-rose-700 border border-rose-200"
                     }`}
                   >
-                    +{evaluationResult.score} Pts
+                    +{evaluationResult.score} pts
                   </span>
                   {evaluationResult.allFound && (
-                    <span className="bg-[#DCFCE7] text-[#15803D] px-2.5 py-0.5 rounded text-xs font-mono font-semibold">
+                    <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-xs font-mono font-medium">
                       All Outliers Identified (+40 Bonus)
                     </span>
                   )}
                 </div>
 
-                <p className="text-sm text-[#475569] leading-relaxed max-w-4xl">
+                <p className="text-sm text-slate-600 leading-relaxed font-sans max-w-4xl">
                   {dataset.explanation}
                 </p>
-                <div className="text-xs font-medium text-[#0F766E] mt-3">
+                <div className="text-xs font-medium text-teal-700 mt-3 font-sans">
                   Advancing to Mission 03: Crack the Code in 2 seconds...
                 </div>
               </div>
