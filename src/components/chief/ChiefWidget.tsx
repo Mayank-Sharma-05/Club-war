@@ -14,7 +14,6 @@ import {
   Settings,
   X,
   Play,
-  Check,
   Sparkles,
 } from "lucide-react";
 
@@ -115,7 +114,7 @@ export const ChiefWidget: React.FC = () => {
         {/* Companion Control Dock */}
         <motion.div
           layout
-          className="pointer-events-auto flex items-center space-x-2 bg-[#FFFFFF] border border-[#CBD5E1] rounded-2xl p-1.5 sm:p-2 shadow-md transition-shadow hover:shadow-lg"
+          className="pointer-events-auto flex items-center space-x-2 bg-[#171127] border border-[#35264D] rounded-2xl p-1.5 sm:p-2 shadow-[0_0_20px_rgba(0,0,0,0.8)] backdrop-blur-md"
         >
           {/* Avatar button: click to replay or expand */}
           <button
@@ -132,8 +131,8 @@ export const ChiefWidget: React.FC = () => {
             <ChiefAvatar emotion={emotion} isSpeaking={isSpeaking} size={isMinimized ? 38 : 42} />
             {isSpeaking && (
               <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0F766E] opacity-75" />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-[#0F766E]" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00E5FF] opacity-75" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-[#00E5FF]" />
               </span>
             )}
           </button>
@@ -142,14 +141,16 @@ export const ChiefWidget: React.FC = () => {
           {!isMinimized && (
             <div className="pr-1 pl-0.5">
               <div className="flex items-center space-x-1.5">
-                <span className="text-xs font-bold text-[#17212B]">CHIEF</span>
-                <span className="text-[10px] text-[#0F766E] font-semibold bg-[#0F766E]/10 px-1.5 py-0.2 rounded font-mono">
+                <span className="text-xs font-display font-bold text-[#F8FAFC] tracking-wider uppercase">
+                  CHIEF
+                </span>
+                <span className="text-[10px] text-[#00E5FF] font-mono font-bold bg-[#00E5FF]/20 border border-[#00E5FF]/40 px-1.5 py-0.2 rounded">
                   VOICE OPS
                 </span>
               </div>
-              <div className="text-[11px] text-[#64748B] font-medium truncate max-w-[130px]">
+              <div className="text-[11px] text-[#94A3B8] font-mono truncate max-w-[130px]">
                 {isSpeaking ? (
-                  <span className="text-[#0F766E] font-semibold">Speaking...</span>
+                  <span className="text-[#00E5FF] font-semibold animate-pulse">Speaking...</span>
                 ) : (
                   <span>Ready & monitoring</span>
                 )}
@@ -158,17 +159,17 @@ export const ChiefWidget: React.FC = () => {
           )}
 
           {/* Action buttons */}
-          <div className="flex items-center space-x-0.5 border-l border-[#E2E8F0] pl-1.5">
+          <div className="flex items-center space-x-0.5 border-l border-[#35264D] pl-1.5">
             {/* Quick Mute Toggle */}
             <button
               onClick={() => setVoiceEnabled(!voiceEnabled)}
               title={voiceEnabled ? "Mute CHIEF voice" : "Unmute CHIEF voice"}
-              className="p-1.5 rounded-lg text-[#64748B] hover:text-[#17212B] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg text-[#94A3B8] hover:text-[#00E5FF] hover:bg-[#100B1D] transition-colors cursor-pointer"
             >
               {voiceEnabled ? (
-                <Volume2 className="w-4 h-4 text-[#0F766E]" />
+                <Volume2 className="w-4 h-4 text-[#00E5FF]" />
               ) : (
-                <VolumeX className="w-4 h-4 text-[#DC2626]" />
+                <VolumeX className="w-4 h-4 text-[#FF365D]" />
               )}
             </button>
 
@@ -177,7 +178,7 @@ export const ChiefWidget: React.FC = () => {
               <button
                 onClick={() => setIsSettingsOpen(true)}
                 title="CHIEF Voice & Text Settings"
-                className="p-1.5 rounded-lg text-[#64748B] hover:text-[#17212B] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-[#94A3B8] hover:text-[#00E5FF] hover:bg-[#100B1D] transition-colors cursor-pointer"
               >
                 <Settings className="w-4 h-4" />
               </button>
@@ -187,7 +188,7 @@ export const ChiefWidget: React.FC = () => {
             <button
               onClick={() => setIsMinimized(!isMinimized)}
               title={isMinimized ? "Expand CHIEF widget" : "Minimize CHIEF widget"}
-              className="p-1.5 rounded-lg text-[#64748B] hover:text-[#17212B] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg text-[#94A3B8] hover:text-[#00E5FF] hover:bg-[#100B1D] transition-colors cursor-pointer"
             >
               {isMinimized ? (
                 <ChevronUp className="w-4 h-4" />
@@ -202,56 +203,56 @@ export const ChiefWidget: React.FC = () => {
       {/* CHIEF Stall-Ready Settings Modal */}
       <AnimatePresence>
         {isSettingsOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#070B14]/40 backdrop-blur-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="w-full max-w-md bg-[#FFFFFF] border border-[#CBD5E1] rounded-2xl p-6 shadow-2xl text-[#17212B]"
+              className="w-full max-w-md bg-[#171127] border border-[#00E5FF]/50 rounded-2xl p-6 shadow-[0_0_40px_rgba(0,229,255,0.25)] text-[#F8FAFC]"
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#E2E8F0]">
+              <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#35264D]">
                 <div className="flex items-center space-x-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-[#0F766E]/10 flex items-center justify-center text-[#0F766E]">
+                  <div className="w-9 h-9 rounded-xl bg-[#00E5FF]/20 border border-[#00E5FF]/40 flex items-center justify-center text-[#00E5FF]">
                     <Sparkles className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-base text-[#17212B]">
-                      CHIEF Operations Settings
+                    <h3 className="font-display font-bold text-base text-[#F8FAFC] uppercase tracking-wider">
+                      CHIEF VOICE CALIBRATION
                     </h3>
-                    <p className="text-xs text-[#64748B]">
-                      Configure voice synthesis and dialogue display
+                    <p className="text-xs font-mono text-[#94A3B8]">
+                      Voice synthesis and commentary settings
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsSettingsOpen(false)}
-                  className="p-1.5 rounded-lg text-[#64748B] hover:text-[#17212B] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+                  className="p-1.5 rounded-lg text-[#94A3B8] hover:text-white hover:bg-[#35264D] transition-colors cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               {/* Settings Controls */}
-              <div className="space-y-4 text-xs">
+              <div className="space-y-4 text-xs font-mono">
                 {/* 1. Voice ON/OFF */}
-                <div className="flex items-center justify-between py-2 border-b border-[#F1F5F9]">
+                <div className="flex items-center justify-between py-2 border-b border-[#35264D]">
                   <div>
-                    <span className="font-semibold text-sm text-[#17212B] block">
-                      CHIEF Voice Output
+                    <span className="font-display font-bold text-sm text-[#F8FAFC] block uppercase">
+                      VOICE OUTPUT
                     </span>
-                    <span className="text-[#64748B] text-[11px]">
+                    <span className="text-[#94A3B8] text-[11px]">
                       Enable spoken audio commentary during missions
                     </span>
                   </div>
                   <button
                     onClick={() => setVoiceEnabled(!voiceEnabled)}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
-                      voiceEnabled ? "bg-[#0F766E]" : "bg-[#CBD5E1]"
+                      voiceEnabled ? "bg-[#00E5FF]" : "bg-[#35264D]"
                     }`}
                   >
                     <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      className={`inline-block h-4 w-4 transform rounded-full bg-[#080611] transition-transform ${
                         voiceEnabled ? "translate-x-6" : "translate-x-1"
                       }`}
                     />
@@ -259,23 +260,23 @@ export const ChiefWidget: React.FC = () => {
                 </div>
 
                 {/* 2. Show CHIEF Text ON/OFF */}
-                <div className="flex items-center justify-between py-2 border-b border-[#F1F5F9]">
+                <div className="flex items-center justify-between py-2 border-b border-[#35264D]">
                   <div>
-                    <span className="font-semibold text-sm text-[#17212B] block">
-                      Show Dialogue Bubble
+                    <span className="font-display font-bold text-sm text-[#F8FAFC] block uppercase">
+                      SPEECH BUBBLE
                     </span>
-                    <span className="text-[#64748B] text-[11px]">
-                      Display written speech bubble on screen
+                    <span className="text-[#94A3B8] text-[11px]">
+                      Display written dialog box on screen
                     </span>
                   </div>
                   <button
                     onClick={() => setShowText(!showText)}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
-                      showText ? "bg-[#0F766E]" : "bg-[#CBD5E1]"
+                      showText ? "bg-[#00E5FF]" : "bg-[#35264D]"
                     }`}
                   >
                     <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      className={`inline-block h-4 w-4 transform rounded-full bg-[#080611] transition-transform ${
                         showText ? "translate-x-6" : "translate-x-1"
                       }`}
                     />
@@ -283,12 +284,12 @@ export const ChiefWidget: React.FC = () => {
                 </div>
 
                 {/* 3. Voice Volume Slider */}
-                <div className="py-2 border-b border-[#F1F5F9]">
+                <div className="py-2 border-b border-[#35264D]">
                   <div className="flex justify-between items-center mb-1.5">
-                    <span className="font-semibold text-[#17212B]">
-                      Voice Volume
+                    <span className="font-display font-bold text-[#F8FAFC] uppercase">
+                      SYNTHESIS VOLUME
                     </span>
-                    <span className="font-mono text-[11px] text-[#0F766E] font-bold">
+                    <span className="font-digital text-sm text-[#00E5FF] font-bold">
                       {Math.round(volume * 100)}%
                     </span>
                   </div>
@@ -299,17 +300,17 @@ export const ChiefWidget: React.FC = () => {
                     step="0.05"
                     value={volume}
                     onChange={(e) => setVolume(parseFloat(e.target.value))}
-                    className="w-full accent-[#0F766E] cursor-pointer"
+                    className="w-full accent-[#00E5FF] cursor-pointer"
                   />
                 </div>
 
                 {/* 4. Preferred Voice Selection */}
-                <div className="py-2 border-b border-[#F1F5F9]">
-                  <label className="font-semibold text-[#17212B] block mb-1">
-                    Preferred Voice (SpeechSynthesis)
+                <div className="py-2 border-b border-[#35264D]">
+                  <label className="font-display font-bold text-[#F8FAFC] block mb-1 uppercase">
+                    MALE SYNTHESIS ENGINE
                   </label>
-                  <p className="text-[11px] text-[#64748B] mb-2">
-                    Priority order: English India Male &rarr; US Male &rarr; UK Male &rarr; English
+                  <p className="text-[11px] text-[#94A3B8] mb-2 font-sans">
+                    Priority: English India Male &rarr; US Male &rarr; UK Male &rarr; English
                   </p>
                   <select
                     value={selectedURI || ""}
@@ -317,10 +318,10 @@ export const ChiefWidget: React.FC = () => {
                       setSelectedURI(e.target.value);
                       setPreferredVoice(e.target.value);
                     }}
-                    className="w-full bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl px-3 py-2 text-xs text-[#17212B] focus:outline-none focus:border-[#0F766E]"
+                    className="w-full bg-[#100B1D] border border-[#35264D] rounded-xl px-3 py-2 text-xs text-[#00E5FF] focus:outline-none focus:border-[#00E5FF]"
                   >
                     <option value="">
-                      Default Auto (Best Male Voice: {selectedVoiceName || "Detecting..."})
+                      Default Male ({selectedVoiceName || "Auto-detecting..."})
                     </option>
                     {englishVoices.map((v) => (
                       <option key={v.voiceURI} value={v.voiceURI}>
@@ -334,29 +335,29 @@ export const ChiefWidget: React.FC = () => {
                 <div className="flex items-center space-x-2 pt-2">
                   <button
                     onClick={testVoice}
-                    className="flex-1 py-2.5 px-3 bg-[#0F766E] hover:bg-[#0D655E] text-[#FFFFFF] font-semibold rounded-xl flex items-center justify-center space-x-1.5 transition-colors cursor-pointer shadow-xs"
+                    className="flex-1 py-2.5 px-3 bg-gradient-to-r from-[#00E5FF] to-[#3B82F6] text-[#080611] font-display font-black text-xs uppercase tracking-wider rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer shadow-[0_0_15px_rgba(0,229,255,0.3)]"
                   >
-                    <Play className="w-3.5 h-3.5 fill-white" />
-                    <span>Test Voice</span>
+                    <Play className="w-3.5 h-3.5 fill-current" />
+                    <span>TEST VOICE</span>
                   </button>
 
                   <button
                     onClick={replayLast}
-                    className="py-2.5 px-3 bg-[#FFFFFF] hover:bg-[#F8FAFC] border border-[#CBD5E1] text-[#475569] font-semibold rounded-xl flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
+                    className="py-2.5 px-3 bg-[#100B1D] border border-[#35264D] hover:border-[#00E5FF] text-[#CBD5E1] hover:text-[#00E5FF] font-display font-bold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Replay Last</span>
+                    <span>REPLAY</span>
                   </button>
                 </div>
               </div>
 
               {/* Close footer */}
-              <div className="mt-5 pt-3 border-t border-[#E2E8F0] flex justify-end">
+              <div className="mt-5 pt-3 border-t border-[#35264D] flex justify-end">
                 <button
                   onClick={() => setIsSettingsOpen(false)}
-                  className="px-5 py-2 bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#17212B] font-semibold rounded-xl text-xs transition-colors cursor-pointer"
+                  className="px-5 py-2 bg-[#100B1D] border border-[#35264D] hover:border-[#00E5FF] text-white font-display font-bold rounded-xl text-xs uppercase tracking-wider transition-colors cursor-pointer"
                 >
-                  Done
+                  SAVE & CLOSE
                 </button>
               </div>
             </motion.div>

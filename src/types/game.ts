@@ -100,7 +100,8 @@ export type PerformanceClassification =
   | "CYBER EXPLORER"
   | "SECURITY SPECIALIST"
   | "ELITE HACKER"
-  | "LEGENDARY DEFENDER";
+  | "LEGENDARY DEFENDER"
+  | "CYBER LEGEND";
 
 export interface GameSettings {
   soundEnabled: boolean;

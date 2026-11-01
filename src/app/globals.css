@@ -1,36 +1,39 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Rajdhani", "Inter", sans-serif;
+  --font-orbitron: "Orbitron", "IBM Plex Mono", monospace;
+  --font-mono: "IBM Plex Mono", "Geist Mono", ui-monospace, SFMono-Regular, monospace;
   
-  --color-app-bg: #F4F6F8;
-  --color-card-bg: #FFFFFF;
-  --color-surface-subtle: #F8FAFC;
-  --color-border-main: #E2E8F0;
-  --color-border-subtle: #CBD5E1;
+  --color-arcade-bg: #080611;
+  --color-arcade-bg-secondary: #100B1D;
+  --color-arcade-card: #171127;
+  --color-arcade-card-hover: #1F1735;
+  --color-arcade-border: #35264D;
+  --color-arcade-border-bright: #5B3D8A;
   
-  --color-text-primary: #17212B;
-  --color-text-secondary: #475569;
-  --color-text-muted: #64748B;
-  
-  --color-primary-teal: #0F766E;
-  --color-secondary-indigo: #4F46E5;
-  --color-status-success: #15803D;
-  --color-status-warning: #D97706;
-  --color-status-danger: #DC2626;
+  --color-neon-purple: #A855F7;
+  --color-neon-cyan: #00E5FF;
+  --color-hot-pink: #FF3CAC;
+  --color-electric-blue: #3B82F6;
+  --color-neon-green: #39FF88;
+  --color-warning-yellow: #FFD43B;
+  --color-danger-red: #FF365D;
 }
 
 :root {
+  --background: #080611;
+  --foreground: #F8FAFC;
   --font-inter: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --background: #F4F6F8;
-  --foreground: #17212B;
+  --font-display: "Rajdhani", sans-serif;
+  --font-orbitron: "Orbitron", monospace;
+  --font-mono: "IBM Plex Mono", monospace;
 }
 
 body {
-  background-color: #F4F6F8;
-  color: #17212B;
+  background-color: #080611;
+  color: #F8FAFC;
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
   user-select: none;
@@ -38,27 +41,92 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Subtle SaaS background grid pattern */
-.bg-light-pattern {
-  background-color: #F4F6F8;
-  background-image: 
-    linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
-  background-size: 28px 28px;
+/* Headings with Rajdhani */
+h1, h2, h3, .font-heading {
+  font-family: var(--font-display), "Rajdhani", sans-serif;
+  letter-spacing: 0.02em;
 }
 
-/* Crisp Clean Scrollbar */
+/* Digital Numbers with Orbitron */
+.font-digital {
+  font-family: var(--font-orbitron), "Orbitron", monospace;
+}
+
+/* Monospace for data & timer */
+.font-code {
+  font-family: var(--font-mono), "IBM Plex Mono", monospace;
+}
+
+/* Cyberpunk Neon Glow Utilities */
+.neon-glow-cyan {
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.4), inset 0 0 10px rgba(0, 229, 255, 0.15);
+}
+
+.neon-glow-purple {
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.4), inset 0 0 10px rgba(168, 85, 247, 0.15);
+}
+
+.neon-glow-pink {
+  box-shadow: 0 0 15px rgba(255, 60, 172, 0.45), inset 0 0 10px rgba(255, 60, 172, 0.2);
+}
+
+.neon-glow-green {
+  box-shadow: 0 0 15px rgba(57, 255, 136, 0.4), inset 0 0 10px rgba(57, 255, 136, 0.15);
+}
+
+.neon-glow-red {
+  box-shadow: 0 0 15px rgba(255, 54, 93, 0.5), inset 0 0 10px rgba(255, 54, 93, 0.2);
+}
+
+.neon-text-cyan {
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.6), 0 0 20px rgba(0, 229, 255, 0.3);
+}
+
+.neon-text-purple {
+  text-shadow: 0 0 8px rgba(168, 85, 247, 0.6), 0 0 20px rgba(168, 85, 247, 0.3);
+}
+
+.neon-text-pink {
+  text-shadow: 0 0 8px rgba(255, 60, 172, 0.6), 0 0 20px rgba(255, 60, 172, 0.3);
+}
+
+.neon-text-green {
+  text-shadow: 0 0 8px rgba(57, 255, 136, 0.6), 0 0 20px rgba(57, 255, 136, 0.3);
+}
+
+/* Cyber Arena Background Grid */
+.bg-cyber-grid {
+  background-color: #080611;
+  background-image: 
+    linear-gradient(to right, rgba(168, 85, 247, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 229, 255, 0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Subtle Animated Scanline Overlay */
+.scanline-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0),
+    rgba(255,255,255,0) 50%,
+    rgba(0, 0, 0, 0.25) 50%,
+    rgba(0, 0, 0, 0.25)
+  );
+  background-size: 100% 4px;
+}
+
+/* Neon Arcade Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #F4F6F8;
+  background: #080611;
 }
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #35264D;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #A855F7;
 }

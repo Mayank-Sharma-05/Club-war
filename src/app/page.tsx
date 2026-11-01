@@ -475,7 +475,7 @@ export default function Home() {
     screen === "results";
 
   return (
-    <div className="min-h-screen bg-[#F4F6F8] text-[#17212B] flex flex-col font-sans select-none relative">
+    <div className="min-h-screen bg-[#080611] text-[#F8FAFC] flex flex-col font-sans select-none relative bg-cyber-grid">
       {/* Sticky Header during Active Missions */}
       {(screen === "mission-1" || screen === "mission-2" || screen === "mission-3") && (
         <GameHeader
