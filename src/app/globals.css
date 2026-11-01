@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-orbitron: var(--font-orbitron), sans-serif;
+  --font-inter: var(--font-inter), sans-serif;
+  
+  --color-cyber-main: #070B14;
+  --color-cyber-dark: #101827;
+  --color-cyber-card: #111C2E;
+  --color-cyber-border: #1E293B;
+  --color-neon-cyan: #00E5FF;
+  --color-neon-purple: #A855F7;
+  --color-danger-red: #FF334F;
+  --color-success-green: #00E676;
+  --color-cyber-amber: #F59E0B;
+  --color-text-primary: #F8FAFC;
+  --color-text-secondary: #94A3B8;
+}
+
+:root {
+  --background: #070B14;
+  --foreground: #F8FAFC;
+}
+
+body {
+  background-color: #070B14;
+  color: #F8FAFC;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+/* Heading font helper */
+.font-cyber {
+  font-family: var(--font-orbitron), system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.05em;
+}
+
+/* Cyber grid background */
+.bg-cyber-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(0, 229, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 229, 255, 0.04) 1px, transparent 1px);
+}
+
+.bg-cyber-dots {
+  background-image: radial-gradient(rgba(0, 229, 255, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Glowing borders and boxes */
+.glow-cyan {
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.25), inset 0 0 15px rgba(0, 229, 255, 0.08);
+}
+
+.glow-cyan-lg {
+  box-shadow: 0 0 30px rgba(0, 229, 255, 0.4), inset 0 0 20px rgba(0, 229, 255, 0.15);
+}
+
+.glow-purple {
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.3), inset 0 0 15px rgba(168, 85, 247, 0.08);
+}
+
+.glow-red {
+  box-shadow: 0 0 20px rgba(255, 51, 79, 0.35), inset 0 0 15px rgba(255, 51, 79, 0.1);
+}
+
+.glow-green {
+  box-shadow: 0 0 20px rgba(0, 230, 118, 0.35), inset 0 0 15px rgba(0, 230, 118, 0.1);
+}
+
+/* Subtle scanlines effect overlay */
+.scanlines {
+  position: relative;
+}
+.scanlines::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+  background-size: 100% 4px;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+/* Custom cyber scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #070B14;
+}
+::-webkit-scrollbar-thumb {
+  background: #1E293B;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00E5FF;
+}
