@@ -10,6 +10,7 @@ const DEFAULT_SETTINGS: ChiefSettings = {
   pitch: 0.90,
   showText: true,
   preferredVoiceURI: undefined,
+  preferredEngine: "elevenlabs",
 };
 
 // Indicators for identifying masculine vs feminine voice names across Chrome, Edge, Safari, Firefox, Windows
@@ -69,7 +70,7 @@ const FEMALE_VOICE_KEYWORDS = [
   "veena",
 ];
 
-type Listener = (state: {
+export type Listener = (state: {
   isSpeaking: boolean;
   currentEmotion: ChiefEmotion;
   currentDialogue: ChiefDialogue | null;
@@ -77,6 +78,8 @@ type Listener = (state: {
   volume: number;
   showText: boolean;
   selectedVoiceName: string | null;
+  activeEngine: "elevenlabs" | "speech_synthesis";
+  elevenLabsConfigured: boolean;
 }) => void;
 
 class SpeechManager {
@@ -91,10 +94,19 @@ class SpeechManager {
   private currentPriority: number = 0;
   private dismissTimer: ReturnType<typeof setTimeout> | null = null;
 
+  // ElevenLabs integration state
+  private currentAudio: HTMLAudioElement | null = null;
+  private abortController: AbortController | null = null;
+  private audioBlobCache: Map<string, string> = new Map();
+  private activeEngine: "elevenlabs" | "speech_synthesis" = "elevenlabs";
+  private elevenLabsConfigured: boolean = false;
+  private elevenLabsAvailable: boolean = true;
+
   constructor() {
     this.loadSettings();
     if (typeof window !== "undefined") {
       this.initVoices();
+      this.probeElevenLabs();
     }
   }
 
@@ -115,6 +127,21 @@ class SpeechManager {
     try {
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(this.settings));
     } catch {}
+  }
+
+  public async probeElevenLabs() {
+    if (typeof window === "undefined") return;
+    try {
+      const res = await fetch("/api/chief/voice");
+      if (res.ok) {
+        const data = await res.json();
+        this.elevenLabsConfigured = Boolean(data.configured);
+        this.elevenLabsAvailable = Boolean(data.configured);
+        this.notify();
+      }
+    } catch {
+      this.elevenLabsConfigured = false;
+    }
   }
 
   public initVoices() {
@@ -260,28 +287,41 @@ class SpeechManager {
     this.notify();
   }
 
-  public subscribe(listener: Listener): () => void {
-    this.listeners.add(listener);
+  public setPreferredEngine(engine: "elevenlabs" | "speech_synthesis") {
+    this.settings.preferredEngine = engine;
+    this.saveSettings();
     this.notify();
-    return () => this.listeners.delete(listener);
-  }
-
-  private notify() {
-    this.listeners.forEach((listener) =>
-      listener({
-        isSpeaking: this.isSpeaking,
-        currentEmotion: this.currentEmotion,
-        currentDialogue: this.currentDialogue,
-        voiceEnabled: this.settings.voiceEnabled,
-        volume: this.settings.volume,
-        showText: this.settings.showText,
-        selectedVoiceName: this.selectedVoice?.name || null,
-      })
-    );
   }
 
   public getSettings(): ChiefSettings {
     return { ...this.settings };
+  }
+
+  public subscribe(listener: Listener): () => void {
+    this.listeners.add(listener);
+    listener(this.getState());
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+
+  private getState() {
+    return {
+      isSpeaking: this.isSpeaking,
+      currentEmotion: this.currentEmotion,
+      currentDialogue: this.currentDialogue,
+      voiceEnabled: this.settings.voiceEnabled,
+      volume: this.settings.volume,
+      showText: this.settings.showText,
+      selectedVoiceName: this.selectedVoice ? this.selectedVoice.name : null,
+      activeEngine: this.activeEngine,
+      elevenLabsConfigured: this.elevenLabsConfigured,
+    };
+  }
+
+  private notify() {
+    const state = this.getState();
+    this.listeners.forEach((l) => l(state));
   }
 
   public setVoiceEnabled(enabled: boolean) {
@@ -300,7 +340,11 @@ class SpeechManager {
   }
 
   public setVolume(volume: number) {
-    this.settings.volume = Math.max(0, Math.min(1, volume));
+    const val = Math.max(0, Math.min(1, volume));
+    this.settings.volume = val;
+    if (this.currentAudio) {
+      this.currentAudio.volume = val;
+    }
     this.saveSettings();
     this.notify();
   }
@@ -318,6 +362,17 @@ class SpeechManager {
   }
 
   public cancelSpeech() {
+    if (this.abortController) {
+      this.abortController.abort();
+      this.abortController = null;
+    }
+    if (this.currentAudio) {
+      this.currentAudio.pause();
+      this.currentAudio.currentTime = 0;
+      this.currentAudio.onplay = null;
+      this.currentAudio.onended = null;
+      this.currentAudio.onerror = null;
+    }
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       try {
         window.speechSynthesis.cancel();
@@ -356,7 +411,7 @@ class SpeechManager {
     const list = DIALOGUE_LIBRARY[eventType];
     if (!list || list.length === 0) return;
 
-    // Pick from pool avoiding the last 5 recent IDs
+    // Pick from pool avoiding recent IDs
     let candidates = list.filter((d) => !this.recentDialogueIds.includes(d.id));
     if (candidates.length === 0) candidates = list;
 
@@ -368,7 +423,7 @@ class SpeechManager {
       return;
     }
 
-    // Cancel existing lower/equal speech and play new chosen dialogue
+    // Cancel existing lower/equal speech immediately to prevent overlaps
     this.cancelSpeech();
 
     // Record recent ID (keep last 6)
@@ -380,157 +435,187 @@ class SpeechManager {
     this.currentDialogue = chosen;
     this.currentEmotion = chosen.emotion;
     this.currentPriority = priority;
-
-    // Try Speech Synthesis if enabled
-    if (
-      this.settings.voiceEnabled &&
-      this.settings.volume > 0 &&
-      typeof window !== "undefined" &&
-      "speechSynthesis" in window
-    ) {
-      try {
-        const utterance = new SpeechSynthesisUtterance(chosen.text);
-        const voice = this.getSelectedVoice();
-        if (voice) {
-          utterance.voice = voice;
-          utterance.lang = voice.lang;
-        }
-        utterance.rate = this.settings.rate || 0.95;
-        utterance.pitch = this.settings.pitch || 0.90;
-        utterance.volume = this.settings.volume;
-
-        utterance.onstart = () => {
-          this.isSpeaking = true;
-          this.notify();
-        };
-
-        utterance.onend = () => {
-          this.isSpeaking = false;
-          this.notify();
-          // Keep dialogue bubble visible for 1.8 seconds after speech completes, then dismiss
-          this.scheduleAutoDismiss(1800);
-        };
-
-        utterance.onerror = () => {
-          this.isSpeaking = false;
-          this.notify();
-          this.scheduleAutoDismiss(3000);
-        };
-
-        window.speechSynthesis.speak(utterance);
-      } catch {
-        this.isSpeaking = false;
-        this.scheduleAutoDismiss(4500);
-      }
-    } else {
-      // Voice muted or unavailable: display dialogue text for 4.5 seconds
-      this.scheduleAutoDismiss(4500);
-    }
-
     this.notify();
+
+    // Play via ElevenLabs AI voice or fallback
+    this.playDialogue(chosen, eventType);
   }
 
-  public testVoice() {
+  private async playDialogue(dialogue: ChiefDialogue, eventType?: ChiefEventType) {
+    if (!this.settings.voiceEnabled || this.settings.volume <= 0) {
+      this.scheduleAutoDismiss(4500);
+      return;
+    }
+
+    // 1. Try ElevenLabs AI Voice if preferred and available
+    if (this.settings.preferredEngine !== "speech_synthesis" && this.elevenLabsAvailable) {
+      const played = await this.playWithElevenLabs(dialogue, eventType);
+      if (played) return;
+    }
+
+    // 2. Fallback to Browser Speech Synthesis
+    this.playWithSpeechSynthesis(dialogue);
+  }
+
+  private async playWithElevenLabs(
+    dialogue: ChiefDialogue,
+    eventType?: ChiefEventType
+  ): Promise<boolean> {
+    if (typeof window === "undefined") return false;
+
+    const controller = new AbortController();
+    this.abortController = controller;
+
+    try {
+      const cacheKey = `${dialogue.id}:${dialogue.emotion}:${dialogue.text}`;
+      let objectUrl = this.audioBlobCache.get(cacheKey);
+
+      if (!objectUrl) {
+        const res = await fetch("/api/chief/voice", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: dialogue.text,
+            emotion: dialogue.emotion,
+            eventType,
+          }),
+          signal: controller.signal,
+        });
+
+        if (!res.ok) {
+          if (res.status === 503) {
+            this.elevenLabsAvailable = false;
+          }
+          return false;
+        }
+
+        const blob = await res.blob();
+        objectUrl = URL.createObjectURL(blob);
+
+        // Keep cache manageable (max 50 cached audio clips)
+        if (this.audioBlobCache.size >= 50) {
+          const firstKey = this.audioBlobCache.keys().next().value;
+          if (firstKey) {
+            const oldUrl = this.audioBlobCache.get(firstKey);
+            if (oldUrl) URL.revokeObjectURL(oldUrl);
+            this.audioBlobCache.delete(firstKey);
+          }
+        }
+        this.audioBlobCache.set(cacheKey, objectUrl);
+      }
+
+      if (controller.signal.aborted) {
+        return true;
+      }
+
+      if (!this.currentAudio) {
+        this.currentAudio = new Audio();
+      }
+      const audio = this.currentAudio;
+      audio.src = objectUrl;
+      audio.volume = this.settings.volume;
+
+      return await new Promise<boolean>((resolve) => {
+        audio.onplay = () => {
+          this.isSpeaking = true;
+          this.activeEngine = "elevenlabs";
+          this.notify();
+        };
+
+        audio.onended = () => {
+          this.isSpeaking = false;
+          this.notify();
+          this.scheduleAutoDismiss(1800);
+          resolve(true);
+        };
+
+        audio.onerror = () => {
+          resolve(false);
+        };
+
+        audio.play().catch(() => {
+          resolve(false);
+        });
+      });
+    } catch {
+      if (controller.signal.aborted) return true;
+      return false;
+    } finally {
+      if (this.abortController === controller) {
+        this.abortController = null;
+      }
+    }
+  }
+
+  private playWithSpeechSynthesis(dialogue: ChiefDialogue) {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      this.scheduleAutoDismiss(4500);
+      return;
+    }
+
+    try {
+      const utterance = new SpeechSynthesisUtterance(dialogue.text);
+      const voice = this.getSelectedVoice();
+      if (voice) {
+        utterance.voice = voice;
+        utterance.lang = voice.lang;
+      }
+      utterance.rate = this.settings.rate || 0.95;
+      utterance.pitch = this.settings.pitch || 0.90;
+      utterance.volume = this.settings.volume;
+
+      utterance.onstart = () => {
+        this.isSpeaking = true;
+        this.activeEngine = "speech_synthesis";
+        this.notify();
+      };
+
+      utterance.onend = () => {
+        this.isSpeaking = false;
+        this.notify();
+        this.scheduleAutoDismiss(1800);
+      };
+
+      utterance.onerror = () => {
+        this.isSpeaking = false;
+        this.notify();
+        this.scheduleAutoDismiss(3000);
+      };
+
+      window.speechSynthesis.speak(utterance);
+    } catch {
+      this.isSpeaking = false;
+      this.scheduleAutoDismiss(4500);
+    }
+  }
+
+  public async testVoice() {
     this.cancelSpeech();
-    const testLine = "Operations Commander CHIEF online and ready. Voice synthesis test successful.";
-    this.currentDialogue = {
+    const testLine =
+      "Operations Commander CHIEF online and ready. AI voice synthesis test successful.";
+    const testDialogue: ChiefDialogue = {
       id: "test_voice",
       text: testLine,
       emotion: "happy",
       priority: 10,
     };
+    this.currentDialogue = testDialogue;
     this.currentEmotion = "happy";
     this.currentPriority = 10;
+    this.notify();
 
-    if (
-      typeof window !== "undefined" &&
-      "speechSynthesis" in window
-    ) {
-      try {
-        const utterance = new SpeechSynthesisUtterance(testLine);
-        const voice = this.getSelectedVoice();
-        if (voice) {
-          utterance.voice = voice;
-          utterance.lang = voice.lang;
-        }
-        utterance.rate = this.settings.rate || 0.95;
-        utterance.pitch = this.settings.pitch || 0.90;
-        utterance.volume = this.settings.volume;
-
-        utterance.onstart = () => {
-          this.isSpeaking = true;
-          this.notify();
-        };
-
-        utterance.onend = () => {
-          this.isSpeaking = false;
-          this.notify();
-          this.scheduleAutoDismiss(2000);
-        };
-
-        utterance.onerror = () => {
-          this.isSpeaking = false;
-          this.notify();
-          this.scheduleAutoDismiss(2000);
-        };
-
-        window.speechSynthesis.speak(utterance);
-      } catch {
-        this.isSpeaking = false;
-        this.scheduleAutoDismiss(3000);
-      }
-    } else {
-      this.scheduleAutoDismiss(3000);
-    }
+    await this.playDialogue(testDialogue);
     this.notify();
   }
 
-  public replayLast() {
+  public async replayLast() {
     if (!this.currentDialogue) return;
     const last = this.currentDialogue;
     this.cancelSpeech();
     this.currentEmotion = last.emotion;
+    this.notify();
 
-    if (
-      this.settings.voiceEnabled &&
-      this.settings.volume > 0 &&
-      typeof window !== "undefined" &&
-      "speechSynthesis" in window
-    ) {
-      try {
-        const utterance = new SpeechSynthesisUtterance(last.text);
-        const voice = this.getSelectedVoice();
-        if (voice) {
-          utterance.voice = voice;
-          utterance.lang = voice.lang;
-        }
-        utterance.rate = this.settings.rate || 0.95;
-        utterance.pitch = this.settings.pitch || 0.90;
-        utterance.volume = this.settings.volume;
-
-        utterance.onstart = () => {
-          this.isSpeaking = true;
-          this.notify();
-        };
-
-        utterance.onend = () => {
-          this.isSpeaking = false;
-          this.notify();
-          this.scheduleAutoDismiss(1800);
-        };
-
-        utterance.onerror = () => {
-          this.isSpeaking = false;
-          this.notify();
-          this.scheduleAutoDismiss(3000);
-        };
-
-        window.speechSynthesis.speak(utterance);
-      } catch {
-        this.isSpeaking = false;
-      }
-    }
-    this.scheduleAutoDismiss(4500);
+    await this.playDialogue(last);
     this.notify();
   }
 }

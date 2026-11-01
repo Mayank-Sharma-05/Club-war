@@ -46,4 +46,5 @@ export interface ChiefSettings {
   pitch: number; // 0.85 to 0.95
   showText: boolean; // Show dialogue text bubble
   preferredVoiceURI?: string; // Explicitly selected voice URI
+  preferredEngine?: "elevenlabs" | "speech_synthesis";
 }

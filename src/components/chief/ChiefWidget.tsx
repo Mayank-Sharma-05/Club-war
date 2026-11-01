@@ -14,8 +14,9 @@ import {
   Settings,
   X,
   Play,
-  Check,
   Sparkles,
+  Cpu,
+  Info,
 } from "lucide-react";
 
 export const ChiefWidget: React.FC = () => {
@@ -27,6 +28,8 @@ export const ChiefWidget: React.FC = () => {
     volume,
     showText,
     selectedVoiceName,
+    activeEngine,
+    elevenLabsConfigured,
     setVoiceEnabled,
     setShowText,
     setVolume,
@@ -144,7 +147,9 @@ export const ChiefWidget: React.FC = () => {
               <div className="flex items-center space-x-1.5">
                 <span className="text-xs font-bold text-[#17212B]">CHIEF</span>
                 <span className="text-[10px] text-[#0F766E] font-semibold bg-[#0F766E]/10 px-1.5 py-0.2 rounded font-mono">
-                  VOICE OPS
+                  {activeEngine === "elevenlabs" && elevenLabsConfigured
+                    ? "ELEVENLABS AI"
+                    : "VOICE OPS"}
                 </span>
               </div>
               <div className="text-[11px] text-[#64748B] font-medium truncate max-w-[130px]">
@@ -217,10 +222,10 @@ export const ChiefWidget: React.FC = () => {
                   </div>
                   <div>
                     <h3 className="font-bold text-base text-[#17212B]">
-                      CHIEF Operations Settings
+                      CHIEF Voice Operations
                     </h3>
                     <p className="text-xs text-[#64748B]">
-                      Configure voice synthesis and dialogue display
+                      ElevenLabs AI voice & speech synthesis configuration
                     </p>
                   </div>
                 </div>
@@ -234,6 +239,32 @@ export const ChiefWidget: React.FC = () => {
 
               {/* Settings Controls */}
               <div className="space-y-4 text-xs">
+                {/* Voice Engine Status Banner */}
+                <div className="p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center space-x-1.5">
+                      <Cpu className="w-3.5 h-3.5 text-[#0F766E]" />
+                      <span className="font-semibold text-xs text-[#17212B]">
+                        Active Voice Engine
+                      </span>
+                    </div>
+                    {elevenLabsConfigured ? (
+                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#DCFCE7] text-[#15803D] border border-[#15803D]/20">
+                        ElevenLabs AI (Adam)
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#F1F5F9] text-[#64748B] border border-[#CBD5E1]">
+                        Browser Speech Fallback
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-[#64748B] leading-relaxed">
+                    {elevenLabsConfigured
+                      ? "High-fidelity AI voice with deep, confident male commander personality and dynamic emotional inflection."
+                      : "Using local browser SpeechSynthesis. Add ELEVENLABS_API_KEY in .env.local to activate the expressive ElevenLabs AI commander voice."}
+                  </p>
+                </div>
+
                 {/* 1. Voice ON/OFF */}
                 <div className="flex items-center justify-between py-2 border-b border-[#F1F5F9]">
                   <div>
@@ -303,13 +334,13 @@ export const ChiefWidget: React.FC = () => {
                   />
                 </div>
 
-                {/* 4. Preferred Voice Selection */}
+                {/* 4. Fallback Browser Voice Selection */}
                 <div className="py-2 border-b border-[#F1F5F9]">
                   <label className="font-semibold text-[#17212B] block mb-1">
-                    Preferred Voice (SpeechSynthesis)
+                    Browser Fallback Voice (Offline / Backup)
                   </label>
                   <p className="text-[11px] text-[#64748B] mb-2">
-                    Priority order: English India Male &rarr; US Male &rarr; UK Male &rarr; English
+                    Used if ElevenLabs AI is offline or unkeyed:
                   </p>
                   <select
                     value={selectedURI || ""}
@@ -320,7 +351,7 @@ export const ChiefWidget: React.FC = () => {
                     className="w-full bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl px-3 py-2 text-xs text-[#17212B] focus:outline-none focus:border-[#0F766E]"
                   >
                     <option value="">
-                      Default Auto (Best Male Voice: {selectedVoiceName || "Detecting..."})
+                      Auto Male ({selectedVoiceName || "Detecting..."})
                     </option>
                     {englishVoices.map((v) => (
                       <option key={v.voiceURI} value={v.voiceURI}>
@@ -330,14 +361,14 @@ export const ChiefWidget: React.FC = () => {
                   </select>
                 </div>
 
-                {/* 5. Action Buttons: Test Voice & Replay Last */}
+                {/* 5. Action Buttons: Preview Voice & Replay Last */}
                 <div className="flex items-center space-x-2 pt-2">
                   <button
                     onClick={testVoice}
                     className="flex-1 py-2.5 px-3 bg-[#0F766E] hover:bg-[#0D655E] text-[#FFFFFF] font-semibold rounded-xl flex items-center justify-center space-x-1.5 transition-colors cursor-pointer shadow-xs"
                   >
                     <Play className="w-3.5 h-3.5 fill-white" />
-                    <span>Test Voice</span>
+                    <span>Preview Voice</span>
                   </button>
 
                   <button

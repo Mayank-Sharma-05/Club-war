@@ -12,6 +12,8 @@ export function useChief() {
   const [volume, setVolumeState] = useState(1.0);
   const [showText, setShowTextState] = useState(true);
   const [selectedVoiceName, setSelectedVoiceName] = useState<string | null>(null);
+  const [activeEngine, setActiveEngine] = useState<"elevenlabs" | "speech_synthesis">("elevenlabs");
+  const [elevenLabsConfigured, setElevenLabsConfigured] = useState(false);
 
   useEffect(() => {
     const unsubscribe = chiefSpeech.subscribe((state) => {
@@ -22,6 +24,8 @@ export function useChief() {
       setVolumeState(state.volume);
       setShowTextState(state.showText);
       setSelectedVoiceName(state.selectedVoiceName);
+      setActiveEngine(state.activeEngine);
+      setElevenLabsConfigured(state.elevenLabsConfigured);
     });
 
     return () => {
@@ -65,6 +69,10 @@ export function useChief() {
     chiefSpeech.setPreferredVoice(voiceURI);
   }, []);
 
+  const setPreferredEngine = useCallback((engine: "elevenlabs" | "speech_synthesis") => {
+    chiefSpeech.setPreferredEngine(engine);
+  }, []);
+
   const getAvailableVoices = useCallback(() => {
     return chiefSpeech.getAvailableVoices();
   }, []);
@@ -81,6 +89,8 @@ export function useChief() {
     volume,
     showText,
     selectedVoiceName,
+    activeEngine,
+    elevenLabsConfigured,
     trigger,
     setVoiceEnabled,
     setShowText,
@@ -90,6 +100,7 @@ export function useChief() {
     cancelSpeech,
     dismissDialogue,
     setPreferredVoice,
+    setPreferredEngine,
     getAvailableVoices,
     getSettings,
   };
