@@ -573,6 +573,7 @@ export default function Home() {
         {screen === "leaderboard" && (
           <Leaderboard
             onBack={() => setScreen(leaderboardReturnScreen)}
+            onBackToMain={() => setScreen(gamerTag ? "briefing" : "landing")}
             onNewGame={handlePlayAgain}
             highlightSessionId={sessionId}
           />
