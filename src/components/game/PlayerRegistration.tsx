@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { UserCheck, ArrowRight, Shield, Terminal, AlertCircle } from "lucide-react";
+import { UserCheck, ArrowRight, AlertCircle, Shield } from "lucide-react";
 import { sound } from "@/lib/sound-engine";
 
 interface PlayerRegistrationProps {
@@ -25,12 +25,12 @@ export const PlayerRegistration: React.FC<PlayerRegistrationProps> = ({
     const trimmed = tag.trim();
     if (!trimmed) {
       sound.playIncorrect();
-      setError("Please enter a valid Analyst Gamer Tag.");
+      setError("Please enter a callsign.");
       return;
     }
     if (trimmed.length > 16) {
       sound.playIncorrect();
-      setError("Gamer Tag cannot exceed 16 characters.");
+      setError("Callsign cannot exceed 16 characters.");
       return;
     }
 
@@ -40,71 +40,50 @@ export const PlayerRegistration: React.FC<PlayerRegistrationProps> = ({
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-cyber-grid bg-[#070B14] relative">
-      {/* Background glow */}
-      <div className="absolute w-[500px] h-[300px] bg-[#00E5FF]/10 blur-[120px] rounded-full pointer-events-none" />
-
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[#090D14] bg-subtle-grid">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="w-full max-w-md bg-[#111C2E]/95 border border-[#1E293B] rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl relative z-10"
+        transition={{ duration: 0.3 }}
+        className="w-full max-w-md bg-[#111827] border border-[#263244] rounded-2xl p-6 sm:p-8 shadow-xl"
       >
-        {/* Terminal Header */}
-        <div className="flex items-center justify-between border-b border-[#1E293B] pb-4 mb-6">
-          <div className="flex items-center space-x-2">
-            <Shield className="w-5 h-5 text-[#00E5FF]" />
-            <span className="font-cyber font-bold text-xs tracking-widest text-[#00E5FF]">
-              AGENT CREDENTIALS
-            </span>
+        {/* Header */}
+        <div className="flex items-center space-x-2.5 pb-4 mb-6 border-b border-[#263244]">
+          <div className="w-8 h-8 rounded-lg bg-[#151F2E] border border-[#263244] flex items-center justify-center text-[#22D3EE]">
+            <Shield className="w-4 h-4" />
           </div>
-          <div className="flex space-x-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#FF334F]/40" />
-            <div className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]/40" />
-            <div className="w-2.5 h-2.5 rounded-full bg-[#00E676]/40" />
+          <div>
+            <h2 className="text-lg font-semibold tracking-tight text-[#F1F5F9]">
+              Analyst Registration
+            </h2>
+            <p className="text-xs text-[#718096]">
+              Enter your callsign for tournament score tracking
+            </p>
           </div>
-        </div>
-
-        <div className="mb-6">
-          <h2 className="font-cyber font-extrabold text-xl sm:text-2xl text-[#F8FAFC] tracking-wide mb-2">
-            ANALYST SIGN-IN
-          </h2>
-          <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
-            Register your operational callsign. This gamer tag will be permanently recorded on the stall tournament leaderboard.
-          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-xs font-cyber tracking-wider text-[#94A3B8] mb-2 uppercase">
-              Gamer Tag (1–16 chars)
+            <label className="block text-xs font-medium text-[#A1AEC0] mb-2">
+              Gamer Tag / Callsign (Max 16 characters)
             </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#94A3B8]">
-                <Terminal className="w-4 h-4 text-[#00E5FF]" />
-              </div>
-              <input
-                type="text"
-                autoFocus
-                maxLength={16}
-                value={tag}
-                onChange={(e) => {
-                  setTag(e.target.value.replace(/[^a-zA-Z0-9_\- ]/g, ""));
-                  if (error) setError(null);
-                }}
-                placeholder="e.g. CIPHER_99"
-                className="w-full pl-10 pr-4 py-3 bg-[#101827] border border-[#1E293B] focus:border-[#00E5FF] focus:outline-none focus:ring-1 focus:ring-[#00E5FF] rounded-xl text-[#F8FAFC] font-mono font-semibold text-sm tracking-wider placeholder:text-[#94A3B8]/40 transition-all glow-cyan"
-              />
-            </div>
+            <input
+              type="text"
+              autoFocus
+              maxLength={16}
+              value={tag}
+              onChange={(e) => {
+                setTag(e.target.value.replace(/[^a-zA-Z0-9_\- ]/g, ""));
+                if (error) setError(null);
+              }}
+              placeholder="e.g. Sentinel_42"
+              className="w-full px-4 py-3 bg-[#151F2E] border border-[#263244] focus:border-[#22D3EE] focus:outline-none rounded-xl text-[#F1F5F9] font-mono text-sm tracking-wide placeholder:text-[#718096] transition-colors"
+            />
             {error && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                className="flex items-center space-x-1.5 text-xs text-[#FF334F] mt-2 font-mono"
-              >
-                <AlertCircle className="w-3.5 h-3.5" />
+              <div className="flex items-center space-x-1.5 text-xs text-[#EF4444] mt-2">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                 <span>{error}</span>
-              </motion.div>
+              </div>
             )}
           </div>
 
@@ -115,29 +94,24 @@ export const PlayerRegistration: React.FC<PlayerRegistrationProps> = ({
                 sound.playClick();
                 onBack();
               }}
-              className="w-full sm:w-1/3 py-3 rounded-xl bg-[#101827] border border-[#1E293B] hover:border-[#94A3B8]/40 text-[#94A3B8] hover:text-[#F8FAFC] font-mono text-xs font-semibold tracking-wider transition-all"
+              className="w-full sm:w-1/3 py-2.5 rounded-xl bg-[#151F2E] border border-[#263244] hover:border-[#334155] text-xs font-medium text-[#A1AEC0] hover:text-[#F1F5F9] transition-colors cursor-pointer"
             >
-              CANCEL
+              Back
             </button>
 
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <button
               disabled={isSubmitting || !tag.trim()}
               type="submit"
-              className="w-full sm:w-2/3 py-3 rounded-xl bg-gradient-to-r from-[#00E5FF] to-[#A855F7] text-[#070B14] font-cyber font-bold text-xs sm:text-sm tracking-widest flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed glow-cyan transition-all"
+              className="w-full sm:w-2/3 py-2.5 rounded-xl bg-[#22D3EE] hover:bg-[#22D3EE]/90 text-[#090D14] font-semibold text-xs tracking-wide flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
-              <UserCheck className="w-4 h-4 fill-current" />
-              <span>CONFIRM CALLSIGN</span>
-              <ArrowRight className="w-4 h-4" />
-            </motion.button>
+              <span>Confirm Callsign</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
         </form>
 
-        <div className="mt-6 pt-4 border-t border-[#1E293B] text-center">
-          <p className="text-[11px] font-mono text-[#94A3B8]/70">
-            One laptop • Local session storage • Zero external cloud sync
-          </p>
+        <div className="mt-6 pt-4 border-t border-[#263244] text-center text-xs text-[#718096]">
+          Scores are saved locally to this laptop tournament station.
         </div>
       </motion.div>
     </div>

@@ -391,8 +391,8 @@ export default function Home() {
       : undefined;
 
   return (
-    <div className="min-h-screen bg-[#070B14] text-[#F8FAFC] flex flex-col font-sans select-none relative">
-      {/* Sticky Arcade Header during Active Missions */}
+    <div className="min-h-screen bg-[#090D14] text-[#F1F5F9] flex flex-col font-sans select-none relative">
+      {/* Sticky Header during Active Missions */}
       {(screen === "mission-1" || screen === "mission-2" || screen === "mission-3") && (
         <GameHeader
           timeRemaining={timeRemaining}

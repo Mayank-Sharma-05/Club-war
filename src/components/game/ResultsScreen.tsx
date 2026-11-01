@@ -12,9 +12,7 @@ import {
   Award,
   CheckCircle2,
   XCircle,
-  Zap,
   Target,
-  Sparkles,
 } from "lucide-react";
 import { MissionResults, Achievement, PerformanceClassification } from "@/types/game";
 import { formatTime } from "@/lib/scoring";
@@ -48,15 +46,14 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
   onViewLeaderboard,
 }) => {
   useEffect(() => {
-    // If completed all 3 missions or score >= 800, blast victory confetti
     if (missionsCompletedCount === 3 || finalScore >= 800) {
       sound.playMissionComplete();
       try {
         confetti({
-          particleCount: 100,
-          spread: 70,
+          particleCount: 80,
+          spread: 60,
           origin: { y: 0.6 },
-          colors: ["#00E5FF", "#A855F7", "#00E676", "#F59E0B"],
+          colors: ["#22D3EE", "#A78BFA", "#22C55E", "#F59E0B"],
         });
       } catch {}
     } else {
@@ -64,51 +61,46 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
     }
   }, [missionsCompletedCount, finalScore]);
 
-  const getClassificationColor = (c: PerformanceClassification) => {
+  const getClassificationBadge = (c: PerformanceClassification) => {
     switch (c) {
       case "LEGENDARY DEFENDER":
-        return "text-[#00E5FF] border-[#00E5FF] bg-[#00E5FF]/10 glow-cyan";
+        return "text-[#22D3EE] border-[#22D3EE]/40 bg-[#22D3EE]/10";
       case "ELITE HACKER":
-        return "text-[#A855F7] border-[#A855F7] bg-[#A855F7]/10 glow-purple";
+        return "text-[#A78BFA] border-[#A78BFA]/40 bg-[#A78BFA]/10";
       case "SECURITY SPECIALIST":
-        return "text-[#00E676] border-[#00E676] bg-[#00E676]/10 glow-green";
+        return "text-[#22C55E] border-[#22C55E]/40 bg-[#22C55E]/10";
       case "CYBER EXPLORER":
-        return "text-[#F59E0B] border-[#F59E0B] bg-[#F59E0B]/10";
+        return "text-[#F59E0B] border-[#F59E0B]/40 bg-[#F59E0B]/10";
       default:
-        return "text-[#94A3B8] border-[#94A3B8]/40 bg-[#101827]";
+        return "text-[#A1AEC0] border-[#263244] bg-[#151F2E]";
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-between p-4 md:p-8 bg-cyber-grid bg-[#070B14] relative">
-      <div className="absolute w-[600px] h-[300px] bg-[#00E5FF]/10 blur-[150px] rounded-full pointer-events-none" />
-
-      {/* Main Results Container */}
+    <div className="min-h-screen flex flex-col items-center justify-between p-4 md:p-8 bg-[#090D14] bg-subtle-grid">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-4xl bg-[#111C2E]/95 border border-[#1E293B] rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl relative z-10 my-auto"
+        transition={{ duration: 0.3 }}
+        className="w-full max-w-4xl bg-[#111827] border border-[#263244] rounded-2xl p-6 sm:p-8 shadow-xl my-auto"
       >
-        {/* Top Header */}
-        <div className="text-center pb-6 border-b border-[#1E293B]">
-          <span className="text-[11px] font-cyber text-[#00E5FF] tracking-widest uppercase">
-            OPERATION DEBRIEFING REPORT
-          </span>
-
-          <h1 className="font-cyber font-black text-2xl sm:text-4xl text-[#F8FAFC] tracking-wider mt-1 mb-3">
+        {/* Header */}
+        <div className="text-center pb-6 border-b border-[#263244]">
+          <div className="text-xs font-semibold text-[#22D3EE] uppercase tracking-wider mb-2">
+            Mission Debriefing
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-semibold text-[#F1F5F9] tracking-tight mb-3">
             {missionsCompletedCount === 3
-              ? "NETWORK THREATS NEUTRALIZED!"
-              : "OPERATION TERMINATED"}
+              ? "All Systems Secured Successfully"
+              : "Mission Terminated"}
           </h1>
 
-          {/* Classification Pill */}
-          <div className="inline-flex items-center space-x-2">
-            <span className="text-xs font-mono text-[#94A3B8]">CALLSIGN:</span>
-            <span className="font-mono font-bold text-sm text-[#F8FAFC]">{gamerTag}</span>
-            <span className="text-[#94A3B8]">•</span>
+          <div className="inline-flex items-center space-x-2 text-xs">
+            <span className="text-[#718096]">Analyst:</span>
+            <span className="font-mono font-medium text-[#F1F5F9]">{gamerTag}</span>
+            <span className="text-[#718096]">•</span>
             <div
-              className={`px-3.5 py-1 rounded-full text-xs font-cyber font-extrabold tracking-widest border uppercase ${getClassificationColor(
+              className={`px-3 py-0.5 rounded-full font-medium border ${getClassificationBadge(
                 classification
               )}`}
             >
@@ -117,148 +109,148 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
           </div>
         </div>
 
-        {/* Primary Stats Grid */}
+        {/* 4 Primary Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-6">
-          <div className="bg-[#101827] border border-[#1E293B] rounded-xl p-4 text-center">
-            <div className="flex items-center justify-center text-[#00E5FF] mb-1">
+          <div className="bg-[#151F2E] border border-[#263244] rounded-xl p-4 text-center">
+            <div className="flex items-center justify-center text-[#22D3EE] mb-1">
               <Trophy className="w-5 h-5" />
             </div>
-            <div className="text-[10px] font-cyber text-[#94A3B8] uppercase">FINAL SCORE</div>
-            <div className="text-xl sm:text-2xl font-mono font-black text-[#F8FAFC]">
+            <div className="text-xs text-[#718096]">Final Score</div>
+            <div className="text-xl sm:text-2xl font-mono font-semibold text-[#F1F5F9]">
               {finalScore.toLocaleString()}
             </div>
           </div>
 
-          <div className="bg-[#101827] border border-[#1E293B] rounded-xl p-4 text-center">
-            <div className="flex items-center justify-center text-[#A855F7] mb-1">
+          <div className="bg-[#151F2E] border border-[#263244] rounded-xl p-4 text-center">
+            <div className="flex items-center justify-center text-[#A78BFA] mb-1">
               <Clock className="w-5 h-5" />
             </div>
-            <div className="text-[10px] font-cyber text-[#94A3B8] uppercase">ELAPSED TIME</div>
-            <div className="text-xl sm:text-2xl font-mono font-black text-[#F8FAFC]">
+            <div className="text-xs text-[#718096]">Elapsed Time</div>
+            <div className="text-xl sm:text-2xl font-mono font-semibold text-[#F1F5F9]">
               {formatTime(timeSpentSeconds)}
             </div>
           </div>
 
-          <div className="bg-[#101827] border border-[#1E293B] rounded-xl p-4 text-center">
-            <div className="flex items-center justify-center text-[#00E676] mb-1">
+          <div className="bg-[#151F2E] border border-[#263244] rounded-xl p-4 text-center">
+            <div className="flex items-center justify-center text-[#22C55E] mb-1">
               <Target className="w-5 h-5" />
             </div>
-            <div className="text-[10px] font-cyber text-[#94A3B8] uppercase">ACCURACY</div>
-            <div className="text-xl sm:text-2xl font-mono font-black text-[#F8FAFC]">
+            <div className="text-xs text-[#718096]">Accuracy</div>
+            <div className="text-xl sm:text-2xl font-mono font-semibold text-[#F1F5F9]">
               {accuracy}%
             </div>
           </div>
 
-          <div className="bg-[#101827] border border-[#1E293B] rounded-xl p-4 text-center">
+          <div className="bg-[#151F2E] border border-[#263244] rounded-xl p-4 text-center">
             <div className="flex items-center justify-center text-[#F59E0B] mb-1">
               <Shield className="w-5 h-5" />
             </div>
-            <div className="text-[10px] font-cyber text-[#94A3B8] uppercase">LIVES REMAINING</div>
-            <div className="text-xl sm:text-2xl font-mono font-black text-[#F8FAFC]">
-              {remainingLives} / 3
+            <div className="text-xs text-[#718096]">Lives Remaining</div>
+            <div className="text-xl sm:text-2xl font-mono font-semibold text-[#F1F5F9]">
+              {remainingLives} of 3
             </div>
           </div>
         </div>
 
-        {/* Mission-Wise Breakdown */}
+        {/* Mission Breakdown */}
         <div className="mb-6">
-          <h3 className="text-xs font-cyber text-[#94A3B8] uppercase tracking-wider mb-3">
-            MISSION BREAKDOWN
+          <h3 className="text-xs font-semibold text-[#718096] uppercase tracking-wider mb-3">
+            Layer Breakdown
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {/* Mission 1 */}
-            <div className="bg-[#101827] border border-[#1E293B] rounded-xl p-3.5 flex flex-col justify-between">
+            {/* M1 */}
+            <div className="bg-[#151F2E] border border-[#263244] rounded-xl p-4 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between text-xs font-cyber text-[#00E5FF] mb-1">
-                  <span>M01: PHISHING</span>
+                <div className="flex items-center justify-between text-xs font-medium text-[#22D3EE] mb-1">
+                  <span>M01: Phishing</span>
                   {missionResults.mission1.completed ? (
-                    <CheckCircle2 className="w-4 h-4 text-[#00E676]" />
+                    <CheckCircle2 className="w-4 h-4 text-[#22C55E]" />
                   ) : (
-                    <XCircle className="w-4 h-4 text-[#FF334F]" />
+                    <XCircle className="w-4 h-4 text-[#EF4444]" />
                   )}
                 </div>
-                <div className="text-xs text-[#94A3B8]">
+                <div className="text-xs text-[#718096]">
                   Lives Lost: {missionResults.mission1.livesLost}
                 </div>
               </div>
-              <div className="mt-2 pt-2 border-t border-[#1E293B] text-right font-mono font-bold text-sm text-[#F8FAFC]">
-                +{missionResults.mission1.score} PTS
+              <div className="mt-2 pt-2 border-t border-[#263244] text-right font-mono font-semibold text-sm text-[#F1F5F9]">
+                +{missionResults.mission1.score} Pts
               </div>
             </div>
 
-            {/* Mission 2 */}
-            <div className="bg-[#101827] border border-[#1E293B] rounded-xl p-3.5 flex flex-col justify-between">
+            {/* M2 */}
+            <div className="bg-[#151F2E] border border-[#263244] rounded-xl p-4 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between text-xs font-cyber text-[#A855F7] mb-1">
-                  <span>M02: OUTLIERS</span>
+                <div className="flex items-center justify-between text-xs font-medium text-[#A78BFA] mb-1">
+                  <span>M02: Outliers</span>
                   {missionResults.mission2.completed ? (
-                    <CheckCircle2 className="w-4 h-4 text-[#00E676]" />
+                    <CheckCircle2 className="w-4 h-4 text-[#22C55E]" />
                   ) : (
-                    <XCircle className="w-4 h-4 text-[#FF334F]" />
+                    <XCircle className="w-4 h-4 text-[#EF4444]" />
                   )}
                 </div>
-                <div className="text-xs text-[#94A3B8]">
-                  Found: {missionResults.mission2.correctOutliersFound} | Wrong: {missionResults.mission2.incorrectSelected}
+                <div className="text-xs text-[#718096]">
+                  Found: {missionResults.mission2.correctOutliersFound} • Wrong: {missionResults.mission2.incorrectSelected}
                 </div>
               </div>
-              <div className="mt-2 pt-2 border-t border-[#1E293B] text-right font-mono font-bold text-sm text-[#F8FAFC]">
-                +{missionResults.mission2.score} PTS
+              <div className="mt-2 pt-2 border-t border-[#263244] text-right font-mono font-semibold text-sm text-[#F1F5F9]">
+                +{missionResults.mission2.score} Pts
               </div>
             </div>
 
-            {/* Mission 3 */}
-            <div className="bg-[#101827] border border-[#1E293B] rounded-xl p-3.5 flex flex-col justify-between">
+            {/* M3 */}
+            <div className="bg-[#151F2E] border border-[#263244] rounded-xl p-4 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between text-xs font-cyber text-[#00E676] mb-1">
-                  <span>M03: DIGITAL VAULT</span>
+                <div className="flex items-center justify-between text-xs font-medium text-[#22C55E] mb-1">
+                  <span>M03: Digital Vault</span>
                   {missionResults.mission3.unlocked ? (
-                    <CheckCircle2 className="w-4 h-4 text-[#00E676]" />
+                    <CheckCircle2 className="w-4 h-4 text-[#22C55E]" />
                   ) : (
-                    <XCircle className="w-4 h-4 text-[#FF334F]" />
+                    <XCircle className="w-4 h-4 text-[#EF4444]" />
                   )}
                 </div>
-                <div className="text-xs text-[#94A3B8]">
+                <div className="text-xs text-[#718096]">
                   Attempts: {missionResults.mission3.attemptsUsed}/5
                 </div>
               </div>
-              <div className="mt-2 pt-2 border-t border-[#1E293B] text-right font-mono font-bold text-sm text-[#F8FAFC]">
-                +{missionResults.mission3.score} PTS
+              <div className="mt-2 pt-2 border-t border-[#263244] text-right font-mono font-semibold text-sm text-[#F1F5F9]">
+                +{missionResults.mission3.score} Pts
               </div>
             </div>
           </div>
         </div>
 
-        {/* Badges / Achievements Earned */}
-        <div className="mb-8">
-          <h3 className="text-xs font-cyber text-[#94A3B8] uppercase tracking-wider mb-3">
-            ACHIEVEMENT COMMENDATIONS
+        {/* Achievements Earned */}
+        <div className="mb-6">
+          <h3 className="text-xs font-semibold text-[#718096] uppercase tracking-wider mb-3">
+            Earned Badges
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
             {achievements.map((ach) => (
               <div
                 key={ach.id}
-                className={`p-3 rounded-xl border flex items-center space-x-3 transition-all ${
+                className={`p-3 rounded-xl border flex items-center space-x-3 transition-colors ${
                   ach.unlocked
-                    ? "bg-[#101827] border-[#00E5FF]/60 text-[#F8FAFC] glow-cyan"
-                    : "bg-[#070B14]/40 border-[#1E293B]/40 text-[#94A3B8]/30 opacity-40"
+                    ? "bg-[#151F2E] border-[#334155] text-[#F1F5F9]"
+                    : "bg-[#151F2E]/30 border-[#263244]/40 text-[#718096]/40 opacity-40"
                 }`}
               >
                 <div
                   className={`p-2 rounded-lg ${
                     ach.unlocked
-                      ? "bg-[#00E5FF]/20 text-[#00E5FF]"
-                      : "bg-[#101827] text-[#94A3B8]/30"
+                      ? "bg-[#22D3EE]/15 text-[#22D3EE]"
+                      : "bg-[#151F2E] text-[#718096]/40"
                   }`}
                 >
                   <Award className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="font-cyber font-bold text-xs tracking-wider">
+                  <div className="font-semibold text-xs text-[#F1F5F9]">
                     {ach.title}
                   </div>
-                  <div className="text-[10px] text-[#94A3B8] line-clamp-1">
+                  <div className="text-[11px] text-[#718096] line-clamp-1">
                     {ach.description}
                   </div>
                 </div>
@@ -267,31 +259,29 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
           </div>
         </div>
 
-        {/* Navigation Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#1E293B]">
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#263244]">
           <button
             onClick={() => {
               sound.playClick();
               onViewLeaderboard();
             }}
-            className="w-full sm:w-1/2 py-3.5 rounded-xl bg-[#101827] border border-[#1E293B] hover:border-[#00E5FF]/50 text-[#F8FAFC] font-cyber font-bold text-xs sm:text-sm tracking-widest flex items-center justify-center space-x-2 transition-all cursor-pointer"
+            className="w-full sm:w-1/2 py-3 rounded-xl bg-[#151F2E] hover:bg-[#1A2638] border border-[#263244] hover:border-[#334155] text-xs font-medium text-[#F1F5F9] flex items-center justify-center space-x-2 transition-colors cursor-pointer"
           >
-            <ListOrdered className="w-4 h-4 text-[#00E5FF]" />
-            <span>VIEW LEADERBOARD</span>
+            <ListOrdered className="w-4 h-4 text-[#22D3EE]" />
+            <span>View Leaderboard</span>
           </button>
 
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          <button
             onClick={() => {
               sound.playClick();
               onPlayAgain();
             }}
-            className="w-full sm:w-1/2 py-3.5 rounded-xl bg-gradient-to-r from-[#00E5FF] to-[#A855F7] text-[#070B14] font-cyber font-black text-xs sm:text-sm tracking-widest flex items-center justify-center space-x-2 glow-cyan cursor-pointer"
+            className="w-full sm:w-1/2 py-3 rounded-xl bg-[#22D3EE] hover:bg-[#22D3EE]/90 text-[#090D14] font-semibold text-xs tracking-wide flex items-center justify-center space-x-2 transition-colors cursor-pointer"
           >
             <RotateCcw className="w-4 h-4" />
-            <span>NEXT PLAYER / REPLAY</span>
-          </motion.button>
+            <span>Next Player / Replay</span>
+          </button>
         </div>
       </motion.div>
     </div>

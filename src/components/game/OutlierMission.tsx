@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { OutlierDataset } from "@/types/game";
-import { Database, CheckCircle2, XCircle, AlertCircle, Sparkles, BarChart3 } from "lucide-react";
+import { BarChart2, CheckCircle2, XCircle, AlertCircle, Sparkles, Info } from "lucide-react";
 import { sound } from "@/lib/sound-engine";
 
 interface OutlierMissionProps {
@@ -49,7 +49,6 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
     const allFound =
       correctCount === dataset.targetOutlierCount && incorrectCount === 0;
 
-    // Scoring: +150 per correct, -25 per incorrect, +100 bonus for finding all outliers
     const baseScore = correctCount * 150 - incorrectCount * 25;
     const bonus = allFound ? 100 : 0;
     const finalScore = Math.max(0, baseScore + bonus);
@@ -73,146 +72,118 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
     onSubmit(finalScore, correctCount, incorrectCount);
   };
 
-  // Find max value in dataset for mini bar chart visualization height
-  const maxValue = Math.max(...dataset.values);
-
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 py-4 md:py-6 flex flex-col flex-grow">
+    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col flex-grow">
       {/* Mission Subheader */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 mb-4 border-b border-[#1E293B] gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-6 border-b border-[#263244] gap-3">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-cyber text-[#A855F7] tracking-wider mb-1">
-            <Database className="w-4 h-4" />
-            <span>MISSION 02 OF 03 // LAYER 2: DATA SCIENCE TELEMETRY</span>
+          <div className="flex items-center space-x-2 text-xs font-semibold text-[#A78BFA] uppercase tracking-wider mb-1">
+            <BarChart2 className="w-4 h-4 text-[#A78BFA]" />
+            <span>Mission 02 — Layer 2 Telemetry</span>
           </div>
-          <h2 className="font-cyber font-extrabold text-lg sm:text-2xl text-[#F8FAFC]">
-            OUTLIER HUNT: {dataset.title}
+          <h2 className="text-xl sm:text-2xl font-semibold text-[#F1F5F9] tracking-tight">
+            Outlier Hunt: {dataset.title}
           </h2>
-          <p className="text-xs text-[#94A3B8] mt-1">{dataset.metricDescription}</p>
+          <p className="text-sm text-[#A1AEC0] mt-1">{dataset.metricDescription}</p>
         </div>
 
-        {/* Target Badge */}
-        <div className="flex items-center space-x-3 bg-[#101827] px-4 py-2 rounded-xl border border-[#1E293B]">
-          <div className="text-right">
-            <div className="text-[10px] font-cyber text-[#94A3B8]">TARGET ANOMALIES</div>
-            <div className="text-xs font-mono font-bold text-[#A855F7]">
-              {selectedIndices.length} / {dataset.targetOutlierCount} SELECTED
-            </div>
-          </div>
+        {/* Selection Status Badge */}
+        <div className="inline-flex items-center space-x-2.5 bg-[#111827] px-4 py-2.5 rounded-xl border border-[#263244] self-start sm:self-auto">
+          <span className="text-xs text-[#718096]">Selected:</span>
+          <span className="text-xs font-mono font-semibold text-[#A78BFA]">
+            {selectedIndices.length} / {dataset.targetOutlierCount} Anomalies
+          </span>
         </div>
       </div>
 
-      {/* Numerical Observations Grid & Chart */}
-      <div className="bg-[#111C2E]/80 border border-[#1E293B] rounded-2xl p-5 md:p-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-2 text-xs font-mono text-[#94A3B8]">
-            <BarChart3 className="w-4 h-4 text-[#00E5FF]" />
-            <span>SAMPLE OBSERVATIONS ({dataset.unit})</span>
-          </div>
-          <span className="text-[11px] font-mono text-[#94A3B8]">
-            Select the values that deviate abnormally from the normal distribution
+      {/* Main Dataset Card */}
+      <div className="bg-[#111827] border border-[#263244] rounded-2xl p-6 mb-6">
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#263244]">
+          <span className="text-xs font-medium text-[#A1AEC0]">
+            Numerical Observations Stream ({dataset.unit})
+          </span>
+          <span className="text-xs text-[#718096]">
+            Target: Identify {dataset.targetOutlierCount} statistical outliers
           </span>
         </div>
 
-        {/* Observation Chips Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6">
+        {/* Numerical Observations Grid: 6 columns on desktop, 4 on tablet, 2 on small screens */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 mb-6">
           {dataset.values.map((val, idx) => {
             const isSelected = selectedIndices.includes(idx);
             const isActualOutlier = dataset.outlierIndices.includes(idx);
 
-            let statusColor = "border-[#1E293B] bg-[#101827]/80 text-[#F8FAFC]";
+            let borderStyle = "border-[#263244] bg-[#151F2E] text-[#F1F5F9] hover:border-[#334155]";
 
             if (isEvaluated) {
               if (isSelected && isActualOutlier) {
-                // Correctly picked outlier
-                statusColor = "border-[#00E676] bg-[#00E676]/20 text-[#00E676] glow-green";
+                borderStyle = "border-[#22C55E] bg-[#22C55E]/15 text-[#22C55E]";
               } else if (isSelected && !isActualOutlier) {
-                // False positive
-                statusColor = "border-[#FF334F] bg-[#FF334F]/20 text-[#FF334F] glow-red";
+                borderStyle = "border-[#EF4444] bg-[#EF4444]/15 text-[#EF4444]";
               } else if (!isSelected && isActualOutlier) {
-                // Missed outlier
-                statusColor = "border-[#F59E0B] bg-[#F59E0B]/20 text-[#F59E0B]";
+                borderStyle = "border-[#F59E0B] bg-[#F59E0B]/15 text-[#F59E0B]";
               } else {
-                statusColor = "border-[#1E293B]/40 bg-[#101827]/40 text-[#94A3B8]/50";
+                borderStyle = "border-[#263244]/40 bg-[#151F2E]/30 text-[#718096]/50";
               }
             } else if (isSelected) {
-              statusColor = "border-[#A855F7] bg-[#A855F7]/20 text-[#A855F7] glow-purple";
+              borderStyle = "border-[#A78BFA] bg-[#A78BFA]/15 text-[#F1F5F9]";
             }
 
-            // Height for mini relative bar
-            const barHeightPercent = Math.max(12, Math.round((val / maxValue) * 100));
-
             return (
-              <motion.button
+              <button
                 key={idx}
                 type="button"
-                whileHover={!isEvaluated ? { y: -2 } : {}}
                 onClick={() => toggleSelect(idx)}
                 disabled={isEvaluated}
-                className={`relative flex flex-col items-center justify-between p-3 rounded-xl border transition-all cursor-pointer h-28 ${statusColor}`}
+                className={`relative flex flex-col items-center justify-between p-4 rounded-xl border transition-all cursor-pointer h-24 ${borderStyle}`}
               >
-                {/* Index tag */}
-                <span className="text-[10px] font-mono text-[#94A3B8] self-start">
-                  #{idx + 1}
+                {/* Observation label */}
+                <span className="text-[11px] font-mono text-[#718096] self-start">
+                  #{String(idx + 1).padStart(2, "0")}
                 </span>
 
-                {/* Relative visual bar */}
-                <div className="w-full flex items-end justify-center h-10 my-1">
-                  <div
-                    className={`w-3 rounded-t-sm transition-all duration-300 ${
-                      isEvaluated && isActualOutlier
-                        ? "bg-[#00E676]"
-                        : isEvaluated && isSelected
-                        ? "bg-[#FF334F]"
-                        : isSelected
-                        ? "bg-[#A855F7]"
-                        : "bg-[#1E293B]"
-                    }`}
-                    style={{ height: `${barHeightPercent}%` }}
-                  />
+                {/* Primary Number Display */}
+                <div className="font-mono font-semibold text-xl tracking-tight my-auto">
+                  {val}
+                  <span className="text-xs text-[#718096] ml-1 font-normal">
+                    {dataset.unit}
+                  </span>
                 </div>
 
-                {/* Number display */}
-                <div className="font-mono font-bold text-base sm:text-lg">
-                  {val} <span className="text-[10px] text-[#94A3B8] font-normal">{dataset.unit}</span>
-                </div>
-
-                {/* Evaluation Marker */}
+                {/* Feedback Marker */}
                 {isEvaluated && (
-                  <div className="absolute -top-2 -right-2">
+                  <div className="absolute top-2 right-2">
                     {isSelected && isActualOutlier && (
-                      <CheckCircle2 className="w-5 h-5 text-[#00E676] bg-[#070B14] rounded-full" />
+                      <CheckCircle2 className="w-4 h-4 text-[#22C55E]" />
                     )}
                     {isSelected && !isActualOutlier && (
-                      <XCircle className="w-5 h-5 text-[#FF334F] bg-[#070B14] rounded-full" />
+                      <XCircle className="w-4 h-4 text-[#EF4444]" />
                     )}
                     {!isSelected && isActualOutlier && (
-                      <AlertCircle className="w-5 h-5 text-[#F59E0B] bg-[#070B14] rounded-full" />
+                      <AlertCircle className="w-4 h-4 text-[#F59E0B]" />
                     )}
                   </div>
                 )}
-              </motion.button>
+              </button>
             );
           })}
         </div>
 
-        {/* Submit or Status Action */}
+        {/* Action Row */}
         {!isEvaluated ? (
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#1E293B]">
-            <div className="text-xs font-mono text-[#94A3B8]">
-              Select exactly {dataset.targetOutlierCount} anomalous data points before submitting.
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#263244]">
+            <div className="flex items-center space-x-2 text-xs text-[#718096]">
+              <Info className="w-4 h-4 text-[#A78BFA] shrink-0" />
+              <span>Select {dataset.targetOutlierCount} anomalous values that deviate from the normal distribution.</span>
             </div>
 
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <button
               onClick={handleSubmit}
               disabled={selectedIndices.length === 0}
-              className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-[#A855F7] to-[#00E5FF] text-[#070B14] font-cyber font-bold text-xs sm:text-sm tracking-widest flex items-center justify-center space-x-2 disabled:opacity-40 disabled:cursor-not-allowed glow-purple cursor-pointer"
+              className="w-full sm:w-auto px-7 py-2.5 rounded-xl bg-[#A78BFA] hover:bg-[#A78BFA]/90 text-[#090D14] font-semibold text-xs tracking-wide flex items-center justify-center space-x-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
-              <Sparkles className="w-4 h-4 fill-current" />
-              <span>SUBMIT ANALYSIS</span>
-            </motion.button>
+              <span>Submit Analysis</span>
+            </button>
           </div>
         ) : null}
       </div>
@@ -221,48 +192,46 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
       <AnimatePresence>
         {isEvaluated && evaluationResult && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`w-full bg-[#111C2E] border rounded-2xl p-5 md:p-6 shadow-2xl ${
+            className={`w-full bg-[#111827] border rounded-xl p-5 sm:p-6 shadow-lg ${
               evaluationResult.allFound
-                ? "border-[#00E676] glow-green"
-                : "border-[#A855F7] glow-purple"
+                ? "border-[#22C55E]/40"
+                : "border-[#A78BFA]/40"
             }`}
           >
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <div className="flex items-center space-x-2 mb-1">
-                  <span className="text-xs font-cyber font-bold text-[#A855F7] uppercase tracking-wider">
-                    STATISTICAL TELEMETRY DECODED
+            <div className="flex items-start space-x-4">
+              <div className="p-2.5 rounded-lg bg-[#A78BFA]/15 text-[#A78BFA] shrink-0 mt-0.5">
+                <BarChart2 className="w-6 h-6" />
+              </div>
+              <div className="flex-grow">
+                <div className="flex items-center space-x-2.5 mb-1">
+                  <span className="text-xs font-semibold text-[#A78BFA] uppercase tracking-wider">
+                    Telemetry Analysis Complete
                   </span>
                   <span
-                    className={`px-2 py-0.5 rounded text-[11px] font-mono font-bold ${
+                    className={`px-2 py-0.5 rounded text-xs font-mono font-medium ${
                       evaluationResult.score > 0
-                        ? "bg-[#00E676]/20 text-[#00E676]"
-                        : "bg-[#FF334F]/20 text-[#FF334F]"
+                        ? "bg-[#22C55E]/15 text-[#22C55E]"
+                        : "bg-[#EF4444]/15 text-[#EF4444]"
                     }`}
                   >
-                    +{evaluationResult.score} PTS
+                    +{evaluationResult.score} Pts
                   </span>
                   {evaluationResult.allFound && (
-                    <span className="bg-[#00E676]/20 text-[#00E676] px-2 py-0.5 rounded text-[10px] font-mono font-bold">
-                      FLAWLESS (+100 BONUS)
+                    <span className="bg-[#22C55E]/15 text-[#22C55E] px-2 py-0.5 rounded text-xs font-mono font-medium">
+                      All Outliers Found (+100 Bonus)
                     </span>
                   )}
                 </div>
 
-                <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed max-w-3xl">
+                <p className="text-sm text-[#A1AEC0] leading-relaxed max-w-4xl">
                   {dataset.explanation}
                 </p>
+                <div className="text-xs text-[#718096] mt-2">
+                  Advancing to Mission 03: Crack the Code...
+                </div>
               </div>
-
-              {/* Continue button */}
-              <button
-                type="button"
-                id="proceed-to-mission-3"
-                className="hidden"
-                aria-hidden="true"
-              />
             </div>
           </motion.div>
         )}

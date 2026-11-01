@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
-import { Orbitron, Inter } from "next/font/google";
+import { Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
-
-const orbitron = Orbitron({
-  subsets: ["latin"],
-  variable: "--font-orbitron",
-  display: "swap",
-});
 
 const inter = Inter({
   subsets: ["latin"],
@@ -14,10 +8,16 @@ const inter = Inter({
   display: "swap",
 });
 
+const ibmPlexMono = IBM_Plex_Mono({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "DATA BREACH: CRITICAL COUNTDOWN | DSS Cyber Arcade",
-  description: "A premium cybersecurity arcade experience presented by the Data Science Society. Neutralize the threat across 3 security layers before time runs out.",
-  keywords: ["cybersecurity", "game", "arcade", "data science society", "phishing", "data breach"],
+  title: "Data Breach: Critical Countdown | DSS Cybersecurity Challenge",
+  description: "A professional cybersecurity arcade challenge by the Data Science Society. Neutralize three system threats before the countdown concludes.",
 };
 
 export default function RootLayout({
@@ -26,8 +26,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${orbitron.variable} ${inter.variable} h-full dark`}>
-      <body className="min-h-full bg-[#070B14] text-[#F8FAFC] antialiased flex flex-col font-sans select-none overflow-x-hidden">
+    <html lang="en" className={`${inter.variable} ${ibmPlexMono.variable} h-full dark`}>
+      <body className="min-h-full bg-[#090D14] text-[#F1F5F9] antialiased flex flex-col font-sans select-none overflow-x-hidden">
         {children}
       </body>
     </html>

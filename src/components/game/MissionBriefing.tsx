@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Shield, ShieldAlert, Clock, KeyRound, Database, Play, CheckCircle2 } from "lucide-react";
+import { Shield, ShieldAlert, Clock, KeyRound, BarChart2, Play, Info } from "lucide-react";
 import { sound } from "@/lib/sound-engine";
 
 interface MissionBriefingProps {
@@ -20,127 +20,127 @@ export const MissionBriefing: React.FC<MissionBriefingProps> = ({
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 md:p-8 bg-cyber-grid bg-[#070B14] relative">
-      <div className="absolute w-[600px] h-[300px] bg-[#A855F7]/10 blur-[140px] rounded-full pointer-events-none" />
-
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 md:p-8 bg-[#090D14] bg-subtle-grid">
       <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4 }}
-        className="w-full max-w-3xl bg-[#111C2E]/95 border border-[#1E293B] rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl relative z-10"
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="w-full max-w-3xl bg-[#111827] border border-[#263244] rounded-2xl p-6 sm:p-8 shadow-xl"
       >
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between border-b border-[#1E293B] pb-4 mb-6 gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-6 border-b border-[#263244] gap-2">
           <div>
-            <span className="text-[10px] font-cyber text-[#00E5FF] tracking-widest uppercase">
-              CONFIDENTIAL BRIEFING
-            </span>
-            <h2 className="font-cyber font-extrabold text-xl sm:text-2xl text-[#F8FAFC]">
-              MISSION DIRECTIVE
-            </h2>
+            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#F1F5F9]">
+              Mission Briefing
+            </h1>
+            <p className="text-sm text-[#A1AEC0] mt-1">
+              Review operational parameters before initiating the countdown
+            </p>
           </div>
-          <div className="px-3 py-1 rounded bg-[#101827] border border-[#00E5FF]/40 text-xs font-mono text-[#00E5FF]">
-            CALLSIGN: <span className="font-bold text-[#F8FAFC]">{gamerTag}</span>
+          <div className="inline-flex items-center space-x-2 self-start sm:self-auto px-3 py-1.5 rounded-lg bg-[#151F2E] border border-[#263244]">
+            <span className="text-xs text-[#718096]">Analyst:</span>
+            <span className="text-xs font-mono font-medium text-[#22D3EE]">{gamerTag}</span>
           </div>
         </div>
 
-        {/* Global Constraints Grid */}
+        {/* 3 Compact Overview Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-          <div className="bg-[#101827] border border-[#1E293B] rounded-xl p-3 flex items-center space-x-3">
-            <div className="p-2 rounded-lg bg-[#00E5FF]/10 text-[#00E5FF]">
+          <div className="bg-[#151F2E] border border-[#263244] rounded-xl p-3.5 flex items-center space-x-3">
+            <div className="p-2 rounded-lg bg-[#22D3EE]/10 text-[#22D3EE] shrink-0">
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-[10px] font-cyber text-[#94A3B8]">GLOBAL CLOCK</div>
-              <div className="text-sm font-mono font-bold text-[#F8FAFC]">03:00 TOTAL</div>
+              <div className="text-xs text-[#718096]">Global Timer</div>
+              <div className="text-sm font-mono font-semibold text-[#F1F5F9]">03:00 Shared</div>
             </div>
           </div>
 
-          <div className="bg-[#101827] border border-[#1E293B] rounded-xl p-3 flex items-center space-x-3">
-            <div className="p-2 rounded-lg bg-[#00E676]/10 text-[#00E676]">
+          <div className="bg-[#151F2E] border border-[#263244] rounded-xl p-3.5 flex items-center space-x-3">
+            <div className="p-2 rounded-lg bg-[#22C55E]/10 text-[#22C55E] shrink-0">
               <Shield className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-[10px] font-cyber text-[#94A3B8]">SYSTEM INTEGRITY</div>
-              <div className="text-sm font-mono font-bold text-[#F8FAFC]">3 LIVES ALLOTTED</div>
+              <div className="text-xs text-[#718096]">System Integrity</div>
+              <div className="text-sm font-mono font-semibold text-[#F1F5F9]">3 Lives Allowed</div>
             </div>
           </div>
 
-          <div className="bg-[#101827] border border-[#1E293B] rounded-xl p-3 flex items-center space-x-3">
-            <div className="p-2 rounded-lg bg-[#A855F7]/10 text-[#A855F7]">
+          <div className="bg-[#151F2E] border border-[#263244] rounded-xl p-3.5 flex items-center space-x-3">
+            <div className="p-2 rounded-lg bg-[#A78BFA]/10 text-[#A78BFA] shrink-0">
               <KeyRound className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-[10px] font-cyber text-[#94A3B8]">VAULT PROTOCOL</div>
-              <div className="text-sm font-mono font-bold text-[#F8FAFC]">5 CODE ATTEMPTS</div>
+              <div className="text-xs text-[#718096]">Vault Security</div>
+              <div className="text-sm font-mono font-semibold text-[#F1F5F9]">5 Code Attempts</div>
             </div>
           </div>
         </div>
 
-        {/* 3 Mission Details */}
-        <div className="space-y-3 mb-8">
-          <div className="bg-[#101827]/70 border border-[#1E293B] rounded-xl p-4 flex items-start space-x-3">
-            <div className="p-2 rounded bg-[#00E5FF]/10 text-[#00E5FF] mt-0.5">
+        {/* Three Mission Detail Rows */}
+        <div className="space-y-3 mb-6">
+          {/* Mission 1 */}
+          <div className="bg-[#151F2E]/60 border border-[#263244] rounded-xl p-4 flex items-start space-x-3.5">
+            <div className="p-2 rounded-lg bg-[#22D3EE]/10 text-[#22D3EE] shrink-0 mt-0.5">
               <ShieldAlert className="w-4 h-4" />
             </div>
-            <div>
+            <div className="flex-grow">
               <div className="flex items-center space-x-2">
-                <span className="text-xs font-cyber font-bold text-[#00E5FF]">MISSION 01:</span>
-                <span className="text-xs font-bold text-[#F8FAFC]">PHISHING HUNT</span>
+                <span className="text-xs font-semibold text-[#22D3EE]">01</span>
+                <span className="text-sm font-semibold text-[#F1F5F9]">Phishing Hunt</span>
               </div>
-              <p className="text-xs text-[#94A3B8] mt-1 leading-relaxed">
-                Examine 4 simulated incoming email dispatches simultaneously. Only 1 is a malicious phishing attack. Wrong selections burn 1 life. Find the phishing email to restore the defense perimeter.
+              <p className="text-xs text-[#A1AEC0] mt-1 leading-relaxed">
+                Review four incoming email transmissions simultaneously. Exactly one message is a phishing attempt. An incorrect selection deducts one life.
               </p>
             </div>
           </div>
 
-          <div className="bg-[#101827]/70 border border-[#1E293B] rounded-xl p-4 flex items-start space-x-3">
-            <div className="p-2 rounded bg-[#A855F7]/10 text-[#A855F7] mt-0.5">
-              <Database className="w-4 h-4" />
+          {/* Mission 2 */}
+          <div className="bg-[#151F2E]/60 border border-[#263244] rounded-xl p-4 flex items-start space-x-3.5">
+            <div className="p-2 rounded-lg bg-[#A78BFA]/10 text-[#A78BFA] shrink-0 mt-0.5">
+              <BarChart2 className="w-4 h-4" />
             </div>
-            <div>
+            <div className="flex-grow">
               <div className="flex items-center space-x-2">
-                <span className="text-xs font-cyber font-bold text-[#A855F7]">MISSION 02:</span>
-                <span className="text-xs font-bold text-[#F8FAFC]">OUTLIER HUNT</span>
+                <span className="text-xs font-semibold text-[#A78BFA]">02</span>
+                <span className="text-sm font-semibold text-[#F1F5F9]">Outlier Hunt</span>
               </div>
-              <p className="text-xs text-[#94A3B8] mt-1 leading-relaxed">
-                Scan telemetry data containing 10–12 observations. Multiple statistical anomalies (outliers) are corrupting the dataset. Identify all outliers and submit your analysis.
+              <p className="text-xs text-[#A1AEC0] mt-1 leading-relaxed">
+                Scan numerical telemetry containing 10–12 observations. Multiple statistical anomalies deviate from the baseline. Select and submit all outliers.
               </p>
             </div>
           </div>
 
-          <div className="bg-[#101827]/70 border border-[#1E293B] rounded-xl p-4 flex items-start space-x-3">
-            <div className="p-2 rounded bg-[#00E676]/10 text-[#00E676] mt-0.5">
+          {/* Mission 3 */}
+          <div className="bg-[#151F2E]/60 border border-[#263244] rounded-xl p-4 flex items-start space-x-3.5">
+            <div className="p-2 rounded-lg bg-[#22C55E]/10 text-[#22C55E] shrink-0 mt-0.5">
               <KeyRound className="w-4 h-4" />
             </div>
-            <div>
+            <div className="flex-grow">
               <div className="flex items-center space-x-2">
-                <span className="text-xs font-cyber font-bold text-[#00E676]">MISSION 03:</span>
-                <span className="text-xs font-bold text-[#F8FAFC]">CRACK THE CODE</span>
+                <span className="text-xs font-semibold text-[#22C55E]">03</span>
+                <span className="text-sm font-semibold text-[#F1F5F9]">Crack the Code</span>
               </div>
-              <p className="text-xs text-[#94A3B8] mt-1 leading-relaxed">
-                Decipher the 4-digit unique cryptographic passcode to unlock the Central Intelligence Vault. Use color feedback: <span className="text-[#00E676] font-bold">GREEN</span> (correct spot), <span className="text-[#F59E0B] font-bold">YELLOW</span> (wrong spot), <span className="text-[#FF334F] font-bold">RED</span> (not in code). Max 5 attempts.
+              <p className="text-xs text-[#A1AEC0] mt-1 leading-relaxed">
+                Decipher a unique 4-digit passcode for the digital vault. Colored blocks reveal whether digits are in the correct position (Green), misplaced (Yellow), or absent (Red).
               </p>
             </div>
           </div>
         </div>
 
-        {/* Warning rules */}
-        <div className="flex items-center space-x-2 mb-6 text-xs font-mono text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 rounded-lg p-3">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
-          <span>The 180s countdown initiates immediately upon clicking INITIALIZE SYSTEM and never resets between missions.</span>
+        {/* Global Timer Notice */}
+        <div className="flex items-center space-x-2 mb-6 px-3.5 py-2.5 rounded-lg bg-[#F59E0B]/10 border border-[#F59E0B]/20 text-xs text-[#F59E0B]">
+          <Info className="w-4 h-4 shrink-0" />
+          <span>The 3-minute global countdown starts immediately and remains running across all three missions.</span>
         </div>
 
-        {/* Action Button */}
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+        {/* Initialize Button */}
+        <button
           onClick={handleLaunch}
-          className="w-full py-4 rounded-xl bg-gradient-to-r from-[#00E5FF] via-[#00E676] to-[#00E5FF] text-[#070B14] font-cyber font-black text-sm sm:text-base tracking-widest flex items-center justify-center space-x-3 glow-cyan-lg shadow-xl cursor-pointer"
+          className="w-full py-3.5 rounded-xl bg-[#22D3EE] hover:bg-[#22D3EE]/90 text-[#090D14] font-semibold text-sm tracking-wide flex items-center justify-center space-x-2 transition-colors cursor-pointer"
         >
-          <Play className="w-5 h-5 fill-current" />
-          <span>INITIALIZE SYSTEM // START TIMER</span>
-        </motion.button>
+          <Play className="w-4 h-4 fill-current" />
+          <span>Initialize System & Start Timer</span>
+        </button>
       </motion.div>
     </div>
   );
