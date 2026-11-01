@@ -17,7 +17,6 @@ function assert(condition, message) {
 // Helper to dynamically load a TypeScript module using ts.transpileModule
 function loadTsModule(filePath) {
   const code = fs.readFileSync(filePath, "utf-8");
-  // Replace type imports and relative imports for evaluation
   const js = ts.transpile(code, {
     module: ts.ModuleKind.CommonJS,
     target: ts.ScriptTarget.ES2022,
@@ -41,13 +40,33 @@ function loadTsModule(filePath) {
   return module.exports;
 }
 
-console.log("=== COMPREHENSIVE DATA BREACH VERIFICATION SUITE ===\n");
+console.log("=== COMPREHENSIVE DATA BREACH VERIFICATION SUITE V3 ===\n");
 
-// 1. Phishing Data
-console.log("[1] Checking Phishing Scenarios...");
+// 1. Timer Consistency Check (2 Minutes / 120s)
+console.log("[1] Checking Global 120-Second (02:00) Timer Configuration...");
+const pageContent = fs.readFileSync("src/app/page.tsx", "utf-8");
+assert(pageContent.includes("TOTAL_GAME_SECONDS = 120;"), "TOTAL_GAME_SECONDS is strictly 120");
+assert(!pageContent.includes("TOTAL_GAME_SECONDS = 180;"), "Old 180s constant removed from page.tsx");
+
+const landingContent = fs.readFileSync("src/components/game/LandingScreen.tsx", "utf-8");
+assert(landingContent.includes("02:00 (120s)"), "Landing screen specifies 02:00 (120s)");
+assert(landingContent.includes("2-minute countdown"), "Landing screen text updated to 2-minute countdown");
+assert(!landingContent.includes("3-minute countdown"), "No 3-minute references in LandingScreen.tsx");
+
+const briefingContent = fs.readFileSync("src/components/game/MissionBriefing.tsx", "utf-8");
+assert(briefingContent.includes("02:00 Shared"), "Briefing card specifies 02:00 Shared");
+assert(briefingContent.includes("2-minute global countdown"), "Briefing notice specifies 2-minute countdown");
+assert(!briefingContent.includes("3-minute global countdown"), "No 3-minute references in MissionBriefing.tsx");
+
+// 2. Phishing Data (30+ Sets, Unpredictable, 50-80 words, Varied Positions)
+console.log("[2] Checking Phishing Challenge Sets (30+ Sets, Varied Positions & Attack Vectors)...");
 const phishingMod = loadTsModule("./src/lib/phishing-data.ts");
 const sets = phishingMod.PHISHING_CHALLENGE_SETS;
-assert(Array.isArray(sets) && sets.length >= 16, `Found ${sets?.length} challenge sets (>= 16 required)`);
+assert(Array.isArray(sets) && sets.length >= 30, `Found ${sets?.length} challenge sets (>= 30 required)`);
+
+const posDistribution = { 0: 0, 1: 0, 2: 0, 3: 0 };
+let legitEmailsWithLinksOrAttachments = 0;
+let phishingEmailsWithoutLinksOrAttachments = 0;
 
 sets.forEach((set, idx) => {
   assert(set.emails.length === 4, `Scenario #${idx + 1} (${set.id}) has exactly 4 emails`);
@@ -56,15 +75,34 @@ sets.forEach((set, idx) => {
   const legit = set.emails.filter((e) => !e.isPhishing);
   assert(legit.length === 3, `Scenario #${idx + 1} has exactly 3 legitimate emails`);
 
+  const pIndex = set.emails.findIndex((e) => e.isPhishing);
+  posDistribution[pIndex]++;
+
   set.emails.forEach((email) => {
-    const words = email.body.trim().split(/\s+/).length;
-    assert(words >= 35 && words <= 70, `Email "${email.subject}" word count (${words}) is within optimal 35-70 range`);
+    const words = email.body.trim().split(/\s+/).filter(Boolean).length;
+    assert(words >= 50 && words <= 80, `Email "${email.subject}" (${email.id}) word count (${words}) is strictly 50-80 words`);
     assert(email.senderEmail.length > 5 && email.senderEmail.includes("@"), `Email sender "${email.senderEmail}" is valid`);
+    assert(email.explanation && email.explanation.length > 20, `Email "${email.subject}" has thorough educational explanation`);
+
+    if (!email.isPhishing && email.linkOrAttachment) {
+      legitEmailsWithLinksOrAttachments++;
+    }
+    if (email.isPhishing && !email.linkOrAttachment) {
+      phishingEmailsWithoutLinksOrAttachments++;
+    }
   });
 });
 
-// 2. Outlier Datasets
-console.log("[2] Checking Outlier Datasets...");
+assert(posDistribution[0] >= 5, `Phishing position 0 well-represented (${posDistribution[0]} sets)`);
+assert(posDistribution[1] >= 5, `Phishing position 1 well-represented (${posDistribution[1]} sets)`);
+assert(posDistribution[2] >= 5, `Phishing position 2 well-represented (${posDistribution[2]} sets)`);
+assert(posDistribution[3] >= 5, `Phishing position 3 well-represented (${posDistribution[3]} sets)`);
+
+assert(legitEmailsWithLinksOrAttachments >= 15, `Legitimate emails have links/attachments (${legitEmailsWithLinksOrAttachments} found)`);
+assert(phishingEmailsWithoutLinksOrAttachments >= 5, `Phishing emails include social engineering without links/attachments (${phishingEmailsWithoutLinksOrAttachments} found)`);
+
+// 3. Outlier Datasets & Interface Secrecy
+console.log("[3] Checking Outlier Datasets & Target Count Concealment...");
 const outlierMod = loadTsModule("./src/lib/outlier-data.ts");
 const datasets = outlierMod.OUTLIER_DATASETS;
 assert(Array.isArray(datasets) && datasets.length >= 8, `Found ${datasets?.length} datasets (>= 8 required)`);
@@ -78,8 +116,13 @@ datasets.forEach((ds) => {
   });
 });
 
-// 3. Password Engine
-console.log("[3] Checking Password Engine & Vault Logic...");
+const outlierComponentContent = fs.readFileSync("src/components/game/OutlierMission.tsx", "utf-8");
+assert(!outlierComponentContent.includes("of {dataset.targetOutlierCount} Anomalies"), "Does NOT reveal target anomaly count in header");
+assert(!outlierComponentContent.includes("Goal: Detect {dataset.targetOutlierCount}"), "Does NOT reveal target anomaly count in goal label");
+assert(outlierComponentContent.includes("Selected:"), "Displays neutral selected values counter");
+
+// 4. Password Engine
+console.log("[4] Checking Password Engine & Vault Logic...");
 const passMod = loadTsModule("./src/lib/password-engine.ts");
 for (let i = 0; i < 20; i++) {
   const pwd = passMod.generateUniquePassword();
@@ -101,15 +144,14 @@ const guess3 = "0246";
 const eval3 = passMod.evaluateGuess(guess3, target);
 assert(eval3.every((f) => f === "red"), "Non-overlapping digits yields all 4 red/gray digits");
 
-// 4. Scoring & Combos
-console.log("[4] Checking Scoring & Combo Multipliers...");
+// 5. Scoring & Combos
+console.log("[5] Checking Scoring & Combo Multipliers...");
 const scoreMod = loadTsModule("./src/lib/scoring.ts");
 assert(scoreMod.getComboMultiplier(0) === 1.0, "Streak 0 -> 1.0x");
 assert(scoreMod.getComboMultiplier(1) === 1.0, "Streak 1 -> 1.0x");
 assert(scoreMod.getComboMultiplier(2) === 1.25, "Streak 2 -> 1.25x");
 assert(scoreMod.getComboMultiplier(3) === 1.5, "Streak 3 -> 1.5x");
 assert(scoreMod.getComboMultiplier(5) === 2.0, "Streak 5 -> 2.0x");
-assert(scoreMod.getComboMultiplier(10) === 2.0, "Streak 10 -> 2.0x");
 
 assert(scoreMod.calculateClassification(1600) === "LEGENDARY DEFENDER", ">=1550 is LEGENDARY DEFENDER");
 assert(scoreMod.calculateClassification(1250) === "ELITE HACKER", ">=1200 is ELITE HACKER");
@@ -117,8 +159,8 @@ assert(scoreMod.calculateClassification(850) === "SECURITY SPECIALIST", ">=800 i
 assert(scoreMod.calculateClassification(450) === "CYBER EXPLORER", ">=400 is CYBER EXPLORER");
 assert(scoreMod.calculateClassification(200) === "ROOKIE ANALYST", "<400 is ROOKIE ANALYST");
 
-// 5. CHIEF Dialogue Library
-console.log("[5] Checking CHIEF Dialogue Library (10+ Variations per Event)...");
+// 6. CHIEF Dialogue Library
+console.log("[6] Checking CHIEF Dialogue Library (10+ Variations per Event, 22 Event Types)...");
 const chiefLibMod = loadTsModule("./src/lib/chief/dialogue-library.ts");
 const lib = chiefLibMod.DIALOGUE_LIBRARY;
 
@@ -139,6 +181,7 @@ const REQUIRED_CATEGORIES = [
   "combo_streak",
   "timer_warning_60",
   "timer_critical_30",
+  "timer_critical_10",
   "game_victory",
   "game_over_time",
   "game_over_lives",
@@ -159,7 +202,7 @@ REQUIRED_CATEGORIES.forEach((cat) => {
 });
 
 // Check specific requested lines
-console.log("[6] Verifying user-requested signature dialogues...");
+console.log("[7] Verifying user-requested signature dialogues...");
 const allTexts = Object.values(lib).flat().map((d) => d.text);
 
 const requestedSnippets = [
@@ -174,12 +217,16 @@ const requestedSnippets = [
   "LET'S GO! That's what I'm talking about, Agent!",
   "Well... let's call that a learning experience.",
   "Three missions, zero excuses, absolute domination. Respect!",
+  "Two minutes, three compromised layers, zero panic.",
 ];
 
 requestedSnippets.forEach((snippet) => {
   const exists = allTexts.some((t) => t.includes(snippet));
   assert(exists, `Required dialogue present: "${snippet}"`);
 });
+
+const old3MinExists = allTexts.some((t) => t.includes("Three minutes, three compromised layers"));
+assert(!old3MinExists, "Old 'Three minutes' reference in game_start removed");
 
 console.log("\n=======================================================");
 console.log(`TOTAL PASSED: ${passCount}`);

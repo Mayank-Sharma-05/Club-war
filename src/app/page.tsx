@@ -24,7 +24,7 @@ import { Leaderboard } from "@/components/game/Leaderboard";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { ChiefWidget } from "@/components/chief/ChiefWidget";
 
-const TOTAL_GAME_SECONDS = 180;
+const TOTAL_GAME_SECONDS = 120;
 const MAX_LIVES = 3;
 
 export default function Home() {
@@ -50,6 +50,7 @@ export default function Home() {
   // Track timer alerts to avoid duplicate voice triggers
   const hasTriggered60WarnRef = useRef(false);
   const hasTriggered30WarnRef = useRef(false);
+  const hasTriggered10WarnRef = useRef(false);
   const lastAlertTimeRef = useRef<number | null>(null);
 
   // Challenges for active session
@@ -99,6 +100,10 @@ export default function Home() {
         hasTriggered30WarnRef.current = true;
         chiefSpeech.trigger("timer_critical_30");
       }
+      if (timeRemaining === 10 && !hasTriggered10WarnRef.current) {
+        hasTriggered10WarnRef.current = true;
+        chiefSpeech.trigger("timer_critical_10");
+      }
     }
   }, [isTimerActive, timeRemaining]);
 
@@ -130,6 +135,7 @@ export default function Home() {
     chiefSpeech.cancelSpeech();
     hasTriggered60WarnRef.current = false;
     hasTriggered30WarnRef.current = false;
+    hasTriggered10WarnRef.current = false;
 
     const randomPhishing =
       PHISHING_CHALLENGE_SETS[Math.floor(Math.random() * PHISHING_CHALLENGE_SETS.length)];

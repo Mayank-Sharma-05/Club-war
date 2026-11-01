@@ -20,7 +20,7 @@ export interface EmailCardData {
   body: string;
   linkOrAttachment?: {
     type: "link" | "attachment";
-    text: string;
+    text?: string;
     url?: string;
     fileName?: string;
     fileSize?: string;

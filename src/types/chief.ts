@@ -25,6 +25,7 @@ export type ChiefEventType =
   | "combo_streak"
   | "timer_warning_60"
   | "timer_critical_30"
+  | "timer_critical_10"
   | "game_victory"
   | "game_over_time"
   | "game_over_lives"

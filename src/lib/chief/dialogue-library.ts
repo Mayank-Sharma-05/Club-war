@@ -10,7 +10,7 @@ export const DIALOGUE_LIBRARY: Record<ChiefEventType, ChiefDialogue[]> = {
     },
     {
       id: "gs_2",
-      text: "Welcome to the hot seat, Agent. Three minutes, three compromised layers, zero panic. You got this.",
+      text: "Welcome to the hot seat, Agent. Two minutes, three compromised layers, zero panic. You got this.",
       emotion: "speaking",
       priority: 2,
     },
@@ -1015,6 +1015,69 @@ export const DIALOGUE_LIBRARY: Record<ChiefEventType, ChiefDialogue[]> = {
     },
   ],
 
+  timer_critical_10: [
+    {
+      id: "tc10_1",
+      text: "TEN SECONDS REMAINING! Enter your final decision now!",
+      emotion: "warning",
+      priority: 6,
+    },
+    {
+      id: "tc10_2",
+      text: "TEN SECONDS! The clock is expiring! Lock it in!",
+      emotion: "warning",
+      priority: 6,
+    },
+    {
+      id: "tc10_3",
+      text: "Ten, nine, eight... make your move right now!",
+      emotion: "warning",
+      priority: 6,
+    },
+    {
+      id: "tc10_4",
+      text: "FINAL TEN SECONDS! Complete the breach protocol!",
+      emotion: "warning",
+      priority: 6,
+    },
+    {
+      id: "tc10_5",
+      text: "Ten seconds on the clock! Don't let time expire, hit confirm!",
+      emotion: "warning",
+      priority: 6,
+    },
+    {
+      id: "tc10_6",
+      text: "Under ten seconds! It's now or never, Agent!",
+      emotion: "warning",
+      priority: 6,
+    },
+    {
+      id: "tc10_7",
+      text: "Ten seconds left! Pure adrenaline rush, finish it!",
+      emotion: "warning",
+      priority: 6,
+    },
+    {
+      id: "tc10_8",
+      text: "COUNTDOWN EXPIRING IN TEN SECONDS! Submit now!",
+      emotion: "warning",
+      priority: 6,
+    },
+    {
+      id: "tc10_9",
+      text: "Ten seconds! The emergency lockdown is initiating!",
+      emotion: "warning",
+      priority: 6,
+    },
+    {
+      id: "tc10_10",
+      text: "FINAL TEN SECONDS! Make every millisecond count!",
+      emotion: "warning",
+      priority: 6,
+    },
+  ],
+
   game_victory: [
     {
       id: "gv_1",
@@ -1129,7 +1192,7 @@ export const DIALOGUE_LIBRARY: Record<ChiefEventType, ChiefDialogue[]> = {
     },
     {
       id: "got_9",
-      text: "The three minutes are up. Review your debrief and come back stronger.",
+      text: "The two minutes are up. Review your debrief and come back stronger.",
       emotion: "speaking",
       priority: 5,
     },

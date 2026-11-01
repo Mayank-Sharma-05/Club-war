@@ -34,6 +34,7 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
 }) => {
   const isWarning = timeRemaining <= 60 && timeRemaining > 30;
   const isCritical = timeRemaining <= 30 && timeRemaining > 0;
+  const isFinal10 = timeRemaining <= 10 && timeRemaining > 0;
   const progressPercent = Math.max(0, Math.min(100, (timeRemaining / totalTime) * 100));
 
   const getMissionTitle = () => {
@@ -74,7 +75,9 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
         <div className="flex flex-col items-center">
           <div
             className={`flex items-center space-x-2 px-3.5 py-1 rounded-lg border font-mono font-semibold text-base transition-colors ${
-              isCritical
+              isFinal10
+                ? "bg-[#DC2626]/15 border-[#DC2626] text-[#DC2626] animate-ping"
+                : isCritical
                 ? "bg-[#DC2626]/10 border-[#DC2626] text-[#DC2626] animate-pulse"
                 : isWarning
                 ? "bg-[#D97706]/10 border-[#D97706] text-[#D97706]"

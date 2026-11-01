@@ -94,7 +94,7 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({
 
         {/* Description */}
         <p className="text-base sm:text-lg text-[#475569] max-w-2xl leading-relaxed mb-8">
-          The Central Intelligence Network has suffered an active cyberattack. Neutralize three compromised security layers before the shared 3-minute countdown reaches zero.
+          The Central Intelligence Network has suffered an active cyberattack. Neutralize three compromised security layers before the shared 2-minute countdown reaches zero.
         </p>
 
         {/* 3 Mission Cards */}
@@ -172,7 +172,7 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({
         <div className="flex items-center space-x-2 mt-4 text-xs font-medium text-[#64748B]">
           <Clock className="w-3.5 h-3.5 text-[#0F766E]" />
           <span>Global Allotment:</span>
-          <span className="font-mono font-semibold text-[#17212B]">03:00 (180s)</span>
+          <span className="font-mono font-semibold text-[#17212B]">02:00 (120s)</span>
         </div>
       </main>
 

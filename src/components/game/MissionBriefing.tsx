@@ -58,7 +58,7 @@ export const MissionBriefing: React.FC<MissionBriefingProps> = ({
             </div>
             <div>
               <div className="text-xs text-[#64748B]">Global Timer</div>
-              <div className="text-sm font-mono font-semibold text-[#17212B]">03:00 Shared</div>
+              <div className="text-sm font-mono font-semibold text-[#17212B]">02:00 Shared</div>
             </div>
           </div>
 
@@ -137,7 +137,7 @@ export const MissionBriefing: React.FC<MissionBriefingProps> = ({
         {/* Global Timer Notice */}
         <div className="flex items-center space-x-2.5 mb-6 px-3.5 py-2.5 rounded-lg bg-[#D97706]/10 border border-[#D97706]/20 text-xs text-[#D97706] font-medium">
           <Info className="w-4 h-4 shrink-0" />
-          <span>The 3-minute global countdown starts immediately upon clicking Initialize System and remains running across all three missions.</span>
+          <span>The 2-minute global countdown starts immediately upon clicking Initialize System and remains running across all three missions.</span>
         </div>
 
         {/* Two Prominent Action Buttons */}

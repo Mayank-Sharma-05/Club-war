@@ -87,23 +87,23 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
           <p className="text-sm text-[#475569] mt-1">{dataset.metricDescription}</p>
         </div>
 
-        {/* Selection Status Badge */}
+        {/* Selection Status Badge (Does NOT reveal target anomaly count) */}
         <div className="inline-flex items-center space-x-2.5 bg-[#FFFFFF] px-4 py-2 rounded-xl border border-[#E2E8F0] self-start sm:self-auto shadow-xs">
           <span className="text-xs font-medium text-[#64748B]">Selected:</span>
           <span className="text-xs font-mono font-bold text-[#4F46E5]">
-            {selectedIndices.length} of {dataset.targetOutlierCount} Anomalies
+            {selectedIndices.length} {selectedIndices.length === 1 ? "value" : "values"}
           </span>
         </div>
       </div>
 
       {/* Main Dataset Card */}
       <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-xs mb-6">
-        <div className="flex items-center justify-between mb-5 pb-3 border-b border-[#E2E8F0]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 pb-3 border-b border-[#E2E8F0] gap-2">
           <span className="text-sm font-semibold text-[#17212B]">
             Observation Samples ({dataset.unit})
           </span>
           <span className="text-xs text-[#64748B] font-medium">
-            Goal: Detect {dataset.targetOutlierCount} statistical anomalies
+            Examine the dataset and select the values that deviate significantly from the normal pattern.
           </span>
         </div>
 
@@ -174,7 +174,7 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#E2E8F0]">
             <div className="flex items-center space-x-2 text-xs text-[#64748B]">
               <Info className="w-4 h-4 text-[#4F46E5] shrink-0" />
-              <span>Click to select the {dataset.targetOutlierCount} abnormal values deviating significantly from the cluster.</span>
+              <span>Analyze the observations and select the values that deviate significantly from the baseline.</span>
             </div>
 
             <button
