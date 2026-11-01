@@ -49,8 +49,8 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
     const allFound =
       correctCount === dataset.targetOutlierCount && incorrectCount === 0;
 
-    const baseScore = correctCount * 150 - incorrectCount * 25;
-    const bonus = allFound ? 100 : 0;
+    const baseScore = correctCount * 50 - incorrectCount * 10;
+    const bonus = allFound ? 40 : 0;
     const finalScore = Math.max(0, baseScore + bonus);
 
     if (allFound) {
@@ -220,7 +220,7 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
                   </span>
                   {evaluationResult.allFound && (
                     <span className="bg-[#DCFCE7] text-[#15803D] px-2.5 py-0.5 rounded text-xs font-mono font-semibold">
-                      All Outliers Identified (+100 Bonus)
+                      All Outliers Identified (+40 Bonus)
                     </span>
                   )}
                 </div>

@@ -36,8 +36,8 @@ export const PhishingMission: React.FC<PhishingMissionProps> = ({
       setSolvedPhishingEmail(email);
       setMissionComplete(true);
       setShowExplanation(true);
-      const bonus = wrongCardIds.length === 0 ? 100 : 0;
-      onCorrect(400 + bonus, wrongCardIds.length);
+      const bonus = wrongCardIds.length === 0 ? 50 : 0;
+      onCorrect(150 + bonus, wrongCardIds.length);
     } else {
       sound.playIncorrect();
       setWrongCardIds((prev) => [...prev, email.id]);
@@ -105,7 +105,7 @@ export const PhishingMission: React.FC<PhishingMissionProps> = ({
                     Threat Neutralized
                   </span>
                   <span className="bg-[#DCFCE7] text-[#15803D] px-2.5 py-0.5 rounded text-xs font-mono font-semibold">
-                    +{wrongCardIds.length === 0 ? "500 (+100 Flawless Bonus)" : "400"} Pts
+                    +{wrongCardIds.length === 0 ? "200 (+50 Flawless Bonus)" : "150"} Pts
                   </span>
                 </div>
                 <h3 className="font-bold text-lg text-[#17212B] mb-1">

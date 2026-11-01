@@ -153,11 +153,11 @@ assert(scoreMod.getComboMultiplier(2) === 1.25, "Streak 2 -> 1.25x");
 assert(scoreMod.getComboMultiplier(3) === 1.5, "Streak 3 -> 1.5x");
 assert(scoreMod.getComboMultiplier(5) === 2.0, "Streak 5 -> 2.0x");
 
-assert(scoreMod.calculateClassification(1600) === "LEGENDARY DEFENDER", ">=1550 is LEGENDARY DEFENDER");
-assert(scoreMod.calculateClassification(1250) === "ELITE HACKER", ">=1200 is ELITE HACKER");
-assert(scoreMod.calculateClassification(850) === "SECURITY SPECIALIST", ">=800 is SECURITY SPECIALIST");
-assert(scoreMod.calculateClassification(450) === "CYBER EXPLORER", ">=400 is CYBER EXPLORER");
-assert(scoreMod.calculateClassification(200) === "ROOKIE ANALYST", "<400 is ROOKIE ANALYST");
+assert(scoreMod.calculateClassification(520) === "LEGENDARY DEFENDER", ">=500 is LEGENDARY DEFENDER");
+assert(scoreMod.calculateClassification(400) === "ELITE HACKER", ">=380 is ELITE HACKER");
+assert(scoreMod.calculateClassification(290) === "SECURITY SPECIALIST", ">=260 is SECURITY SPECIALIST");
+assert(scoreMod.calculateClassification(180) === "CYBER EXPLORER", ">=140 is CYBER EXPLORER");
+assert(scoreMod.calculateClassification(80) === "ROOKIE ANALYST", "<140 is ROOKIE ANALYST");
 
 // 6. CHIEF Dialogue Library
 console.log("[6] Checking CHIEF Dialogue Library (10+ Variations per Event, 22 Event Types)...");

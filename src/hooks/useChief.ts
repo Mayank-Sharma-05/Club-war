@@ -1,37 +1,15 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { ChiefDialogue, ChiefEmotion, ChiefEventType, ChiefSettings } from "@/types/chief";
+import { useSyncExternalStore, useCallback } from "react";
+import { ChiefEventType, ChiefSettings } from "@/types/chief";
 import { chiefSpeech } from "@/lib/chief/speech-manager";
 
 export function useChief() {
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [emotion, setEmotion] = useState<ChiefEmotion>("idle");
-  const [dialogue, setDialogue] = useState<ChiefDialogue | null>(null);
-  const [voiceEnabled, setVoiceEnabledState] = useState(true);
-  const [volume, setVolumeState] = useState(1.0);
-  const [showText, setShowTextState] = useState(true);
-  const [selectedVoiceName, setSelectedVoiceName] = useState<string | null>(null);
-  const [activeEngine, setActiveEngine] = useState<"elevenlabs" | "speech_synthesis">("elevenlabs");
-  const [elevenLabsConfigured, setElevenLabsConfigured] = useState(false);
-
-  useEffect(() => {
-    const unsubscribe = chiefSpeech.subscribe((state) => {
-      setIsSpeaking(state.isSpeaking);
-      setEmotion(state.currentEmotion);
-      setDialogue(state.currentDialogue);
-      setVoiceEnabledState(state.voiceEnabled);
-      setVolumeState(state.volume);
-      setShowTextState(state.showText);
-      setSelectedVoiceName(state.selectedVoiceName);
-      setActiveEngine(state.activeEngine);
-      setElevenLabsConfigured(state.elevenLabsConfigured);
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+  const state = useSyncExternalStore(
+    chiefSpeech.subscribe,
+    chiefSpeech.getSnapshot,
+    chiefSpeech.getServerSnapshot
+  );
 
   const trigger = useCallback((event: ChiefEventType, priority?: number) => {
     chiefSpeech.trigger(event, priority);
@@ -82,15 +60,15 @@ export function useChief() {
   }, []);
 
   return {
-    isSpeaking,
-    emotion,
-    dialogue,
-    voiceEnabled,
-    volume,
-    showText,
-    selectedVoiceName,
-    activeEngine,
-    elevenLabsConfigured,
+    isSpeaking: state.isSpeaking,
+    emotion: state.currentEmotion,
+    dialogue: state.currentDialogue,
+    voiceEnabled: state.voiceEnabled,
+    volume: state.volume,
+    showText: state.showText,
+    selectedVoiceName: state.selectedVoiceName,
+    activeEngine: state.activeEngine,
+    elevenLabsConfigured: state.elevenLabsConfigured,
     trigger,
     setVoiceEnabled,
     setShowText,

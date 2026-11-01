@@ -8,10 +8,10 @@ export function getComboMultiplier(streak: number): number {
 }
 
 export function calculateClassification(score: number): PerformanceClassification {
-  if (score >= 1550) return "LEGENDARY DEFENDER";
-  if (score >= 1200) return "ELITE HACKER";
-  if (score >= 800) return "SECURITY SPECIALIST";
-  if (score >= 400) return "CYBER EXPLORER";
+  if (score >= 500) return "LEGENDARY DEFENDER";
+  if (score >= 380) return "ELITE HACKER";
+  if (score >= 260) return "SECURITY SPECIALIST";
+  if (score >= 140) return "CYBER EXPLORER";
   return "ROOKIE ANALYST";
 }
 

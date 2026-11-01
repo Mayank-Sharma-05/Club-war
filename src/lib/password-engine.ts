@@ -61,15 +61,15 @@ export function evaluateGuess(guess: string, secret: string): CodeFeedbackType[]
 export function getCodeScoreForAttempt(attemptNumber: number): number {
   switch (attemptNumber) {
     case 1:
-      return 500;
+      return 180;
     case 2:
-      return 400;
+      return 140;
     case 3:
-      return 300;
-    case 4:
-      return 200;
-    case 5:
       return 100;
+    case 4:
+      return 70;
+    case 5:
+      return 40;
     default:
       return 0;
   }

@@ -46,7 +46,7 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
   onViewLeaderboard,
 }) => {
   useEffect(() => {
-    if (missionsCompletedCount === 3 || finalScore >= 800) {
+    if (missionsCompletedCount === 3 || finalScore >= 350) {
       sound.playMissionComplete();
       try {
         confetti({
