@@ -20,6 +20,7 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
   const [evaluationResult, setEvaluationResult] = useState<{
     correctCount: number;
     incorrectCount: number;
+    missedCount: number;
     score: number;
     allFound: boolean;
   } | null>(null);
@@ -46,12 +47,14 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
       }
     });
 
-    const allFound =
-      correctCount === dataset.targetOutlierCount && incorrectCount === 0;
+    const missedCount = Math.max(0, dataset.targetOutlierCount - correctCount);
+    const allFound = correctCount === dataset.targetOutlierCount && incorrectCount === 0;
 
-    const baseScore = correctCount * 50 - incorrectCount * 10;
-    const bonus = allFound ? 40 : 0;
-    const finalScore = Math.max(0, baseScore + bonus);
+    // Starting score: 100 points
+    // Deduct 20 points for every incorrectly selected value
+    // Deduct 20 points for every actual outlier missed
+    // Minimum 0 points
+    const finalScore = Math.max(0, 100 - (incorrectCount * 20) - (missedCount * 20));
 
     if (allFound) {
       sound.playCombo();
@@ -64,6 +67,7 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
     setEvaluationResult({
       correctCount,
       incorrectCount,
+      missedCount,
       score: finalScore,
       allFound,
     });
@@ -79,7 +83,7 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
         <div>
           <div className="flex items-center space-x-2 text-xs font-semibold text-indigo-700 mb-1">
             <BarChart2 className="w-4 h-4 text-indigo-700" />
-            <span>Mission 02 — Telemetry Anomaly</span>
+            <span>Mission 02 — Telemetry Anomaly (Max 100 Pts)</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-heading font-bold text-slate-900 tracking-tight">
             Outlier Hunt: {dataset.title}
@@ -174,7 +178,7 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-100">
             <div className="flex items-center space-x-2 text-xs text-slate-500 font-sans">
               <Info className="w-4 h-4 text-indigo-700 shrink-0" />
-              <span>Select all abnormal data points, then click Submit Analysis.</span>
+              <span>Select all abnormal data points (-20 per incorrect selection, -20 per missed anomaly).</span>
             </div>
 
             <button
@@ -216,11 +220,16 @@ export const OutlierMission: React.FC<OutlierMissionProps> = ({
                         : "bg-rose-50 text-rose-700 border border-rose-200"
                     }`}
                   >
-                    +{evaluationResult.score} pts
+                    +{evaluationResult.score} / 100 pts
                   </span>
-                  {evaluationResult.allFound && (
-                    <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-xs font-mono font-medium">
-                      All Outliers Identified (+40 Bonus)
+                  {evaluationResult.incorrectCount > 0 && (
+                    <span className="text-xs text-rose-600 font-sans">
+                      (-{evaluationResult.incorrectCount * 20} for {evaluationResult.incorrectCount} false positive{evaluationResult.incorrectCount > 1 ? "s" : ""})
+                    </span>
+                  )}
+                  {evaluationResult.missedCount > 0 && (
+                    <span className="text-xs text-amber-700 font-sans">
+                      (-{evaluationResult.missedCount * 20} for {evaluationResult.missedCount} missed anomaly)
                     </span>
                   )}
                 </div>

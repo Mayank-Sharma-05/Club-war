@@ -8,14 +8,15 @@ export function getComboMultiplier(streak: number): number {
 }
 
 export function calculateClassification(score: number): PerformanceClassification {
-  if (score >= 500) return "LEGENDARY DEFENDER";
-  if (score >= 380) return "ELITE HACKER";
-  if (score >= 260) return "SECURITY SPECIALIST";
-  if (score >= 140) return "CYBER EXPLORER";
+  if (score >= 260) return "LEGENDARY DEFENDER";
+  if (score >= 200) return "ELITE HACKER";
+  if (score >= 140) return "SECURITY SPECIALIST";
+  if (score >= 80) return "CYBER EXPLORER";
   return "ROOKIE ANALYST";
 }
 
 export function formatTime(seconds: number): string {
+  if (typeof seconds !== "number" || isNaN(seconds)) return "00:00";
   const clamped = Math.max(0, Math.floor(seconds));
   const mins = Math.floor(clamped / 60);
   const secs = clamped % 60;

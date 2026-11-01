@@ -144,8 +144,16 @@ const guess3 = "0246";
 const eval3 = passMod.evaluateGuess(guess3, target);
 assert(eval3.every((f) => f === "red"), "Non-overlapping digits yields all 4 red/gray digits");
 
+// Test getCodeScoreForAttempt (100, 80, 60, 40, 20, 0)
+assert(passMod.getCodeScoreForAttempt(1) === 100, "Attempt 1 yields 100 pts");
+assert(passMod.getCodeScoreForAttempt(2) === 80, "Attempt 2 yields 80 pts");
+assert(passMod.getCodeScoreForAttempt(3) === 60, "Attempt 3 yields 60 pts");
+assert(passMod.getCodeScoreForAttempt(4) === 40, "Attempt 4 yields 40 pts");
+assert(passMod.getCodeScoreForAttempt(5) === 20, "Attempt 5 yields 20 pts");
+assert(passMod.getCodeScoreForAttempt(6) === 0, "Attempt 6 yields 0 pts");
+
 // 5. Scoring & Combos
-console.log("[5] Checking Scoring & Combo Multipliers...");
+console.log("[5] Checking Scoring & Leaderboard Tie-Breakers...");
 const scoreMod = loadTsModule("./src/lib/scoring.ts");
 assert(scoreMod.getComboMultiplier(0) === 1.0, "Streak 0 -> 1.0x");
 assert(scoreMod.getComboMultiplier(1) === 1.0, "Streak 1 -> 1.0x");
@@ -153,11 +161,30 @@ assert(scoreMod.getComboMultiplier(2) === 1.25, "Streak 2 -> 1.25x");
 assert(scoreMod.getComboMultiplier(3) === 1.5, "Streak 3 -> 1.5x");
 assert(scoreMod.getComboMultiplier(5) === 2.0, "Streak 5 -> 2.0x");
 
-assert(scoreMod.calculateClassification(520) === "LEGENDARY DEFENDER", ">=500 is LEGENDARY DEFENDER");
-assert(scoreMod.calculateClassification(400) === "ELITE HACKER", ">=380 is ELITE HACKER");
-assert(scoreMod.calculateClassification(290) === "SECURITY SPECIALIST", ">=260 is SECURITY SPECIALIST");
-assert(scoreMod.calculateClassification(180) === "CYBER EXPLORER", ">=140 is CYBER EXPLORER");
-assert(scoreMod.calculateClassification(80) === "ROOKIE ANALYST", "<140 is ROOKIE ANALYST");
+assert(scoreMod.calculateClassification(280) === "LEGENDARY DEFENDER", ">=260 is LEGENDARY DEFENDER");
+assert(scoreMod.calculateClassification(230) === "ELITE HACKER", ">=200 is ELITE HACKER");
+assert(scoreMod.calculateClassification(170) === "SECURITY SPECIALIST", ">=140 is SECURITY SPECIALIST");
+assert(scoreMod.calculateClassification(100) === "CYBER EXPLORER", ">=80 is CYBER EXPLORER");
+assert(scoreMod.calculateClassification(50) === "ROOKIE ANALYST", "<80 is ROOKIE ANALYST");
+
+// Leaderboard Sorting & Tie-Breaker Tests
+const storageMod = loadTsModule("./src/lib/storage.ts");
+const playerA1 = { id: "a1", gamerTag: "Player A", score: 270, completionTimeSeconds: 65, createdAt: 1000 };
+const playerB1 = { id: "b1", gamerTag: "Player B", score: 270, completionTimeSeconds: 90, createdAt: 2000 };
+assert(storageMod.sortLeaderboardEntries(playerA1, playerB1) < 0, "Same score: Lower time ranks higher (Player A 65s > Player B 90s)");
+
+const playerA2 = { id: "a2", gamerTag: "Player A", score: 280, completionTimeSeconds: 100, createdAt: 1000 };
+const playerB2 = { id: "b2", gamerTag: "Player B", score: 270, completionTimeSeconds: 60, createdAt: 2000 };
+assert(storageMod.sortLeaderboardEntries(playerA2, playerB2) < 0, "Higher score ranks higher regardless of time (Player A 280 > Player B 270)");
+
+const playerA3 = { id: "a3", gamerTag: "Player A", score: 270, completionTimeSeconds: 65, createdAt: 1000 };
+const playerB3 = { id: "b3", gamerTag: "Player B", score: 270, completionTimeSeconds: 65, createdAt: 2000 };
+assert(storageMod.sortLeaderboardEntries(playerA3, playerB3) < 0, "Same score and time: Earlier submission ranks higher");
+
+// Older record compatibility
+const oldRecord = { id: "old", gamerTag: "Old", score: 250 };
+const newRecord = { id: "new", gamerTag: "New", score: 250, completionTimeSeconds: 60, createdAt: 3000 };
+assert(typeof storageMod.sortLeaderboardEntries(oldRecord, newRecord) === "number", "Older records handled gracefully without errors");
 
 // 6. CHIEF Dialogue Library
 console.log("[6] Checking CHIEF Dialogue Library (10+ Variations per Event, 22 Event Types)...");

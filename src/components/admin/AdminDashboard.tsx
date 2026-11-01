@@ -273,7 +273,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <tr key={r.id} className="hover:bg-slate-50 text-slate-800">
                           <td className="py-2 px-3 text-slate-400">#{idx + 1}</td>
                           <td className="py-2 px-3 font-medium text-slate-900">{r.gamerTag}</td>
-                          <td className="py-2 px-3 text-teal-700 font-mono font-bold">{r.score}</td>
+                          <td className="py-2 px-3 text-teal-700 font-mono font-bold">{r.score} / 300</td>
                           <td className="py-2 px-3 font-mono text-slate-600">
                             {formatTime(r.completionTimeSeconds)}
                           </td>

@@ -36,14 +36,16 @@ export const PhishingMission: React.FC<PhishingMissionProps> = ({
       setSolvedPhishingEmail(email);
       setMissionComplete(true);
       setShowExplanation(true);
-      const bonus = wrongCardIds.length === 0 ? 50 : 0;
-      onCorrect(150 + bonus, wrongCardIds.length);
+      const scoreEarned = Math.max(0, 100 - wrongCardIds.length * 25);
+      onCorrect(scoreEarned, wrongCardIds.length);
     } else {
       sound.playIncorrect();
       setWrongCardIds((prev) => [...prev, email.id]);
       onWrong();
     }
   };
+
+  const finalMissionScore = Math.max(0, 100 - wrongCardIds.length * 25);
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-36 flex flex-col flex-grow">
@@ -52,7 +54,7 @@ export const PhishingMission: React.FC<PhishingMissionProps> = ({
         <div>
           <div className="flex items-center space-x-2 text-xs font-semibold text-teal-700 mb-1">
             <ShieldAlert className="w-4 h-4 text-teal-700" />
-            <span>Mission 01 — Email Defense</span>
+            <span>Mission 01 — Email Defense (Max 100 Pts)</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-heading font-bold text-slate-900 tracking-tight">
             Phishing Hunt: {challengeSet.scenarioTitle}
@@ -61,7 +63,7 @@ export const PhishingMission: React.FC<PhishingMissionProps> = ({
 
         <div className="inline-flex items-center space-x-2 text-xs text-slate-600 bg-white px-3.5 py-2 rounded-xl border border-slate-200 self-start sm:self-auto shadow-2xs font-sans">
           <Info className="w-4 h-4 text-teal-700 shrink-0" />
-          <span>Read all 4 emails. Identify and flag the deceptive phishing attack.</span>
+          <span>Read all 4 emails. Identify the phishing vector. Incorrect choices deduct 25 pts.</span>
         </div>
       </div>
 
@@ -105,8 +107,13 @@ export const PhishingMission: React.FC<PhishingMissionProps> = ({
                     Threat Neutralized
                   </span>
                   <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-xs font-mono font-medium">
-                    +{wrongCardIds.length === 0 ? "200 (+50 Flawless Bonus)" : "150"} pts
+                    +{finalMissionScore} / 100 pts
                   </span>
+                  {wrongCardIds.length > 0 && (
+                    <span className="text-xs text-rose-600 font-sans">
+                      (-{wrongCardIds.length * 25} for {wrongCardIds.length} incorrect choice{wrongCardIds.length > 1 ? "s" : ""})
+                    </span>
+                  )}
                 </div>
                 <h3 className="font-heading font-semibold text-lg text-slate-900 mb-1">
                   {solvedPhishingEmail.phishingType || "Attack Analysis"}

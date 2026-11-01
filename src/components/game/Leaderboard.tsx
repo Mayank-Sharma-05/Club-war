@@ -67,28 +67,28 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
     switch (rank) {
       case 1:
         return (
-          <div className="flex items-center space-x-1.5 text-amber-600 font-semibold font-sans">
-            <Trophy className="w-4 h-4 text-amber-600 fill-amber-600/20" />
-            <span>#1</span>
+          <div className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200/90 text-amber-700 font-semibold font-sans text-xs shadow-2xs">
+            <Trophy className="w-3.5 h-3.5 text-amber-600 fill-amber-500/20" />
+            <span>#1 Gold</span>
           </div>
         );
       case 2:
         return (
-          <div className="flex items-center space-x-1.5 text-slate-600 font-semibold font-sans">
-            <Medal className="w-4 h-4 text-slate-500" />
-            <span>#2</span>
+          <div className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200/90 text-slate-700 font-semibold font-sans text-xs shadow-2xs">
+            <Medal className="w-3.5 h-3.5 text-slate-500" />
+            <span>#2 Silver</span>
           </div>
         );
       case 3:
         return (
-          <div className="flex items-center space-x-1.5 text-amber-700 font-semibold font-sans">
-            <Medal className="w-4 h-4 text-amber-700" />
-            <span>#3</span>
+          <div className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-amber-100/60 border border-amber-300/80 text-amber-900 font-semibold font-sans text-xs shadow-2xs">
+            <Medal className="w-3.5 h-3.5 text-amber-700" />
+            <span>#3 Bronze</span>
           </div>
         );
       default:
         return (
-          <span className="font-mono text-xs text-slate-500">
+          <span className="font-mono text-xs font-medium text-slate-500 pl-1">
             #{rank}
           </span>
         );
@@ -110,7 +110,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
               Tournament Standings
             </h1>
             <p className="text-sm font-sans text-slate-500 mt-1">
-              Top Cyber Analysts ranked by score and completion time
+              Ranked by highest final score (/300), fastest completion time, and submission order
             </p>
           </div>
 
@@ -151,8 +151,8 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
                 <tr className="border-b border-slate-100 text-xs font-semibold text-slate-500 font-sans">
                   <th className="py-3 px-3">Rank</th>
                   <th className="py-3 px-3">Callsign</th>
-                  <th className="py-3 px-3">Score</th>
-                  <th className="py-3 px-3">Time</th>
+                  <th className="py-3 px-3">Final Score</th>
+                  <th className="py-3 px-3">Completion Time</th>
                   <th className="py-3 px-3">Accuracy</th>
                   <th className="py-3 px-3">Classification</th>
                   <th className="py-3 px-3">Date</th>
@@ -182,10 +182,15 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
                           </span>
                         )}
                       </td>
-                      <td className="py-3 px-3 whitespace-nowrap font-mono font-bold text-teal-700">
-                        {entry.score.toLocaleString()}
+                      <td className="py-3 px-3 whitespace-nowrap">
+                        <div className="flex items-baseline space-x-1">
+                          <span className="font-mono font-bold text-teal-700 text-sm">
+                            {entry.score}
+                          </span>
+                          <span className="font-mono text-xs text-slate-400">/ 300</span>
+                        </div>
                       </td>
-                      <td className="py-3 px-3 whitespace-nowrap font-mono text-slate-600">
+                      <td className="py-3 px-3 whitespace-nowrap font-mono font-medium text-slate-700">
                         {formatTime(entry.completionTimeSeconds)}
                       </td>
                       <td className="py-3 px-3 whitespace-nowrap font-mono font-semibold text-emerald-700">

@@ -58,18 +58,24 @@ export function evaluateGuess(guess: string, secret: string): CodeFeedbackType[]
   return feedback;
 }
 
+/**
+ * Starting score: 100 points.
+ * Deduct 20 points for every incorrect attempt.
+ * Max 5 attempts. Correctly cracking passcode completes the mission.
+ * Minimum score is 0.
+ */
 export function getCodeScoreForAttempt(attemptNumber: number): number {
   switch (attemptNumber) {
     case 1:
-      return 180;
-    case 2:
-      return 140;
-    case 3:
       return 100;
+    case 2:
+      return 80;
+    case 3:
+      return 60;
     case 4:
-      return 70;
-    case 5:
       return 40;
+    case 5:
+      return 20;
     default:
       return 0;
   }

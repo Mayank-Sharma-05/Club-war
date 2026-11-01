@@ -88,9 +88,11 @@ export interface LeaderboardEntry {
   gamerTag: string;
   score: number;
   completionTimeSeconds: number;
+  timeRemaining?: number;
   accuracy: number;
   missionsCompleted: number;
   date: string;
+  createdAt?: number;
   badges: string[];
   classification: string;
 }

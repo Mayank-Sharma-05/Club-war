@@ -116,7 +116,7 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
         <div>
           <div className="flex items-center space-x-2 text-xs font-semibold text-emerald-700 mb-1">
             <KeyRound className="w-4 h-4 text-emerald-700" />
-            <span>Mission 03 — Vault Decryption</span>
+            <span>Mission 03 — Vault Decryption (Max 100 Pts)</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-heading font-bold text-slate-900 tracking-tight">
             Crack the Code: Digital Vault
@@ -371,7 +371,7 @@ export const CodeMission: React.FC<CodeMissionProps> = ({
                 Code verified in {attemptsUsed} attempt{attemptsUsed > 1 ? "s" : ""}. Core system secured!
               </p>
               <div className="inline-block px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-mono font-semibold text-sm">
-                +{getCodeScoreForAttempt(attemptsUsed)} Points Earned
+                +{getCodeScoreForAttempt(attemptsUsed)} / 100 Points Earned
               </div>
             </div>
           </motion.div>

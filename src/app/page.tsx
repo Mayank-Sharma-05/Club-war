@@ -172,7 +172,12 @@ export default function Home() {
 
       const activeResults = customResults || missionResults;
       const finalLives = customLives !== undefined ? customLives : lives;
-      const timeSpent = TOTAL_GAME_SECONDS - timeRemaining;
+
+      // Accurate completion time in seconds
+      const elapsedSeconds = startTimeRef.current
+        ? Math.min(TOTAL_GAME_SECONDS, Math.max(0, Math.round((Date.now() - startTimeRef.current) / 1000)))
+        : TOTAL_GAME_SECONDS - timeRemaining;
+      const remainingTime = Math.max(0, TOTAL_GAME_SECONDS - elapsedSeconds);
 
       let completedCount = 0;
       if (activeResults.mission1.completed) completedCount++;
@@ -197,17 +202,22 @@ export default function Home() {
         totalActions > 0 ? Math.round((correctActions / totalActions) * 100) : 0;
       const accuracy = Math.min(100, Math.max(0, rawAccuracy));
 
-      let calculatedScore = score;
-      if (completedCount === 3 && timeRemaining > 0) {
-        calculatedScore += timeRemaining * 2;
-        setScore(calculatedScore);
-      }
+      // Final Score = Mission 1 + Mission 2 + Mission 3 (Max 300, Min 0)
+      const calculatedScore = Math.min(
+        300,
+        Math.max(
+          0,
+          (activeResults.mission1.score || 0) +
+            (activeResults.mission2.score || 0) +
+            (activeResults.mission3.score || 0)
+        )
+      );
+      setScore(calculatedScore);
 
       const classification = calculateClassification(calculatedScore);
       const achievements = evaluateAchievements(activeResults, calculatedScore, finalLives);
       const unlockedBadges = achievements.filter((a) => a.unlocked).map((a) => a.title);
 
-      // Check current leaderboard for high score
       const currentEntries = getLeaderboard();
       const previousHighScore =
         currentEntries.length > 0 ? Math.max(...currentEntries.map((e) => e.score)) : 0;
@@ -219,7 +229,8 @@ export default function Home() {
         id: sessionId || `session-${Date.now()}`,
         gamerTag: gamerTag || "ANALYST",
         score: calculatedScore,
-        completionTimeSeconds: timeSpent,
+        completionTimeSeconds: elapsedSeconds,
+        timeRemaining: remainingTime,
         accuracy,
         missionsCompleted: completedCount,
         date: new Date().toLocaleDateString(undefined, {
@@ -228,6 +239,7 @@ export default function Home() {
           hour: "2-digit",
           minute: "2-digit",
         }),
+        createdAt: Date.now(),
         badges: unlockedBadges,
         classification,
       };
@@ -245,7 +257,7 @@ export default function Home() {
         }
       }, 500);
     },
-    [hasRecordedScore, missionResults, lives, timeRemaining, score, sessionId, gamerTag]
+    [hasRecordedScore, missionResults, lives, timeRemaining, sessionId, gamerTag]
   );
 
   const handleGameOverDueToTime = useCallback(() => {
@@ -280,8 +292,7 @@ export default function Home() {
   };
 
   const handlePhishingCorrect = (scoreEarned: number, livesLost: number) => {
-    const multiplier = getComboMultiplier(comboStreak + 1);
-    const finalScoreEarned = Math.round(scoreEarned * multiplier);
+    const finalScoreEarned = Math.min(100, Math.max(0, scoreEarned));
 
     setScore((prev) => prev + finalScoreEarned);
     setComboStreak((prev) => prev + 1);
@@ -315,8 +326,7 @@ export default function Home() {
     incorrectCount: number
   ) => {
     const isSuccess = correctCount > 0 && incorrectCount === 0;
-    const multiplier = isSuccess ? getComboMultiplier(comboStreak + 1) : 1;
-    const finalScoreEarned = Math.round(scoreEarned * multiplier);
+    const finalScoreEarned = Math.min(100, Math.max(0, scoreEarned));
 
     setScore((prev) => prev + finalScoreEarned);
     setComboStreak((prev) => (isSuccess ? prev + 1 : 0));
@@ -369,8 +379,7 @@ export default function Home() {
     attemptsUsed: number,
     unlocked: boolean
   ) => {
-    const multiplier = unlocked ? getComboMultiplier(comboStreak + 1) : 1;
-    const finalScoreEarned = Math.round(scoreEarned * multiplier);
+    const finalScoreEarned = unlocked ? Math.min(100, Math.max(0, scoreEarned)) : 0;
 
     setScore((prev) => prev + finalScoreEarned);
     if (unlocked) {
@@ -551,6 +560,8 @@ export default function Home() {
             accuracy={liveAccuracy}
             missionsCompletedCount={completedMissionsCount}
             remainingLives={lives}
+            timeRemaining={timeRemaining}
+            sessionId={sessionId}
             classification={currentClassification}
             missionResults={missionResults}
             achievements={currentAchievements}

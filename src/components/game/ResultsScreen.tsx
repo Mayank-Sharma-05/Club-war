@@ -1,33 +1,36 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import {
   Trophy,
   Clock,
-  Shield,
   RotateCcw,
   ListOrdered,
   Award,
   CheckCircle2,
   XCircle,
-  Target,
+  TimerReset,
+  Medal,
 } from "lucide-react";
 import { MissionResults, Achievement, PerformanceClassification } from "@/types/game";
 import { formatTime } from "@/lib/scoring";
 import { sound } from "@/lib/sound-engine";
+import { getLeaderboard } from "@/lib/storage";
 
 interface ResultsScreenProps {
   gamerTag: string;
   finalScore: number;
   timeSpentSeconds: number;
+  timeRemaining?: number;
   accuracy: number;
   missionsCompletedCount: number;
   remainingLives: number;
   classification: PerformanceClassification;
   missionResults: MissionResults;
   achievements: Achievement[];
+  sessionId?: string;
   onPlayAgain: () => void;
   onViewLeaderboard: () => void;
 }
@@ -36,17 +39,19 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
   gamerTag,
   finalScore,
   timeSpentSeconds,
-  accuracy,
+  timeRemaining = 0,
   missionsCompletedCount,
-  remainingLives,
   classification,
   missionResults,
   achievements,
+  sessionId,
   onPlayAgain,
   onViewLeaderboard,
 }) => {
+  const [leaderboardRank, setLeaderboardRank] = useState<number | null>(null);
+
   useEffect(() => {
-    if (missionsCompletedCount === 3 || finalScore >= 350) {
+    if (missionsCompletedCount === 3 || finalScore >= 240) {
       sound.playMissionComplete();
       try {
         confetti({
@@ -60,6 +65,16 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
       sound.playGameOver();
     }
   }, [missionsCompletedCount, finalScore]);
+
+  useEffect(() => {
+    if (sessionId) {
+      const list = getLeaderboard();
+      const idx = list.findIndex((e) => e.id === sessionId);
+      if (idx !== -1) {
+        setLeaderboardRank(idx + 1);
+      }
+    }
+  }, [sessionId]);
 
   const getClassificationBadge = (c: PerformanceClassification) => {
     switch (c) {
@@ -95,7 +110,7 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
               : "Mission Terminated"}
           </h1>
 
-          <div className="inline-flex items-center space-x-2 text-xs font-sans">
+          <div className="inline-flex items-center flex-wrap justify-center gap-2 text-xs font-sans">
             <span className="text-slate-500 font-medium">Analyst:</span>
             <span className="font-semibold text-slate-900">{gamerTag}</span>
             <span className="text-slate-300">•</span>
@@ -106,64 +121,83 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
             >
               {classification}
             </div>
+            {leaderboardRank !== null && (
+              <>
+                <span className="text-slate-300">•</span>
+                <div className="px-3 py-1 rounded-full font-medium border border-amber-200 bg-amber-50 text-amber-800 flex items-center space-x-1">
+                  <Trophy className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Leaderboard Rank #{leaderboardRank}</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
         {/* 4 Primary Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-6">
+          {/* Final Score / 300 */}
           <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-4 text-center">
             <div className="flex items-center justify-center text-teal-700 mb-1">
               <Trophy className="w-5 h-5" />
             </div>
             <div className="text-xs text-slate-500 font-sans">Final Score</div>
-            <div className="text-xl sm:text-2xl font-mono font-bold text-slate-900">
-              {finalScore.toLocaleString()}
+            <div className="flex items-baseline justify-center space-x-1 text-slate-900 mt-0.5">
+              <span className="text-xl sm:text-2xl font-mono font-bold">{finalScore}</span>
+              <span className="text-xs font-mono text-slate-400">/ 300</span>
             </div>
           </div>
 
+          {/* Completion Time */}
           <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-4 text-center">
             <div className="flex items-center justify-center text-indigo-700 mb-1">
               <Clock className="w-5 h-5" />
             </div>
-            <div className="text-xs text-slate-500 font-sans">Elapsed Time</div>
-            <div className="text-xl sm:text-2xl font-mono font-bold text-slate-900">
+            <div className="text-xs text-slate-500 font-sans">Completion Time</div>
+            <div className="text-xl sm:text-2xl font-mono font-bold text-slate-900 mt-0.5">
               {formatTime(timeSpentSeconds)}
             </div>
           </div>
 
+          {/* Time Remaining */}
           <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-4 text-center">
             <div className="flex items-center justify-center text-emerald-700 mb-1">
-              <Target className="w-5 h-5" />
+              <TimerReset className="w-5 h-5" />
             </div>
-            <div className="text-xs text-slate-500 font-sans">Accuracy</div>
-            <div className="text-xl sm:text-2xl font-mono font-bold text-slate-900">
-              {accuracy}%
+            <div className="text-xs text-slate-500 font-sans">Time Remaining</div>
+            <div className="text-xl sm:text-2xl font-mono font-bold text-slate-900 mt-0.5">
+              {formatTime(timeRemaining)}
             </div>
           </div>
 
+          {/* Rank Position */}
           <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-4 text-center">
             <div className="flex items-center justify-center text-amber-600 mb-1">
-              <Shield className="w-5 h-5" />
+              <Medal className="w-5 h-5" />
             </div>
-            <div className="text-xs text-slate-500 font-sans">Lives Remaining</div>
-            <div className="text-xl sm:text-2xl font-mono font-bold text-slate-900">
-              {remainingLives} of 3
+            <div className="text-xs text-slate-500 font-sans">Standings Rank</div>
+            <div className="text-xl sm:text-2xl font-mono font-bold text-slate-900 mt-0.5">
+              {leaderboardRank !== null ? `#${leaderboardRank}` : "—"}
             </div>
           </div>
         </div>
 
         {/* Mission Breakdown */}
         <div className="mb-6">
-          <h3 className="text-xs font-semibold text-slate-500 mb-3 font-sans">
-            Layer Breakdown
-          </h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xs font-semibold text-slate-500 font-sans">
+              Individual Mission Performance
+            </h3>
+            <span className="text-xs font-mono text-slate-400">
+              Total: {finalScore} / 300 pts
+            </span>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* M1 */}
             <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-4 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between text-xs font-semibold text-teal-700 mb-1 font-sans">
-                  <span>M01: Phishing</span>
+                  <span>Mission 01: Phishing</span>
                   {missionResults.mission1.completed ? (
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   ) : (
@@ -171,11 +205,13 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
                   )}
                 </div>
                 <div className="text-xs text-slate-500 font-sans">
-                  Lives Lost: {missionResults.mission1.livesLost}
+                  {missionResults.mission1.livesLost === 0
+                    ? "Flawless — 0 incorrect selections"
+                    : `${missionResults.mission1.livesLost} incorrect selection(s) (-${missionResults.mission1.livesLost * 25} pts)`}
                 </div>
               </div>
               <div className="mt-2 pt-2 border-t border-slate-200/80 text-right font-mono font-bold text-sm text-slate-900">
-                +{missionResults.mission1.score} pts
+                +{missionResults.mission1.score} / 100 pts
               </div>
             </div>
 
@@ -183,7 +219,7 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
             <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-4 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between text-xs font-semibold text-indigo-700 mb-1 font-sans">
-                  <span>M02: Outliers</span>
+                  <span>Mission 02: Outliers</span>
                   {missionResults.mission2.completed ? (
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   ) : (
@@ -191,11 +227,11 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
                   )}
                 </div>
                 <div className="text-xs text-slate-500 font-sans">
-                  Found: {missionResults.mission2.correctOutliersFound} • Miss: {missionResults.mission2.incorrectSelected}
+                  Found: {missionResults.mission2.correctOutliersFound} • False: {missionResults.mission2.incorrectSelected}
                 </div>
               </div>
               <div className="mt-2 pt-2 border-t border-slate-200/80 text-right font-mono font-bold text-sm text-slate-900">
-                +{missionResults.mission2.score} pts
+                +{missionResults.mission2.score} / 100 pts
               </div>
             </div>
 
@@ -203,7 +239,7 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
             <div className="bg-slate-50/70 border border-slate-200/80 rounded-xl p-4 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between text-xs font-semibold text-emerald-700 mb-1 font-sans">
-                  <span>M03: Digital Vault</span>
+                  <span>Mission 03: Digital Vault</span>
                   {missionResults.mission3.unlocked ? (
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   ) : (
@@ -211,11 +247,13 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
                   )}
                 </div>
                 <div className="text-xs text-slate-500 font-sans">
-                  Attempts: {missionResults.mission3.attemptsUsed}/5
+                  {missionResults.mission3.unlocked
+                    ? `Cracked in ${missionResults.mission3.attemptsUsed} attempt(s)`
+                    : "Passcode decryption failed"}
                 </div>
               </div>
               <div className="mt-2 pt-2 border-t border-slate-200/80 text-right font-mono font-bold text-sm text-slate-900">
-                +{missionResults.mission3.score} pts
+                +{missionResults.mission3.score} / 100 pts
               </div>
             </div>
           </div>

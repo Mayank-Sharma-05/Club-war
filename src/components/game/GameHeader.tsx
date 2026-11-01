@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Shield, ShieldAlert, Volume2, VolumeX, Clock, Zap } from "lucide-react";
+import { Shield, ShieldAlert, Volume2, VolumeX, Clock } from "lucide-react";
 import { formatTime } from "@/lib/scoring";
 import { MissionId } from "@/types/game";
 
@@ -23,8 +23,6 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
   timeRemaining,
   totalTime,
   score,
-  comboStreak,
-  comboMultiplier,
   lives,
   maxLives,
   currentMission,
@@ -120,21 +118,15 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
             })}
           </div>
 
-          {/* Score & Combo */}
-          <div className="flex items-center space-x-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
-            <div className="flex items-baseline space-x-1.5">
-              <span className="text-xs text-slate-500 font-medium hidden md:inline">Score</span>
+          {/* Score out of 300 */}
+          <div className="flex items-center space-x-1.5 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+            <span className="text-xs text-slate-500 font-medium hidden md:inline">Score</span>
+            <div className="flex items-baseline space-x-0.5">
               <span className="font-mono text-sm sm:text-base font-semibold text-slate-900">
-                {score.toLocaleString()}
+                {score}
               </span>
+              <span className="font-mono text-xs text-slate-400">/ 300</span>
             </div>
-
-            {comboStreak >= 2 && (
-              <div className="flex items-center space-x-0.5 bg-teal-50 border border-teal-200/60 text-teal-700 px-1.5 py-0.5 rounded text-xs font-mono font-medium">
-                <Zap className="w-3 h-3 fill-current" />
-                <span>{comboMultiplier}x</span>
-              </div>
-            )}
           </div>
 
           {/* Sound Toggle */}

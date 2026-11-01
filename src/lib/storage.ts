@@ -8,6 +8,34 @@ const DEFAULT_SETTINGS: GameSettings = {
   operatorPin: "1337",
 };
 
+/**
+ * Leaderboard Ranking Order:
+ * 1. Higher final score ranks first.
+ * 2. If two players have the same score, the player with lower completion time ranks higher.
+ * 3. If both score and completion time are identical, use earlier submission time as the final tie-breaker.
+ */
+export function sortLeaderboardEntries(a: LeaderboardEntry, b: LeaderboardEntry): number {
+  // 1. Higher final score ranks first
+  const scoreA = typeof a.score === "number" ? a.score : 0;
+  const scoreB = typeof b.score === "number" ? b.score : 0;
+  if (scoreB !== scoreA) {
+    return scoreB - scoreA;
+  }
+
+  // 2. If same score, lower completion time ranks higher
+  // Older records without completionTimeSeconds default gracefully to 120s
+  const timeA = typeof a.completionTimeSeconds === "number" ? a.completionTimeSeconds : 120;
+  const timeB = typeof b.completionTimeSeconds === "number" ? b.completionTimeSeconds : 120;
+  if (timeA !== timeB) {
+    return timeA - timeB;
+  }
+
+  // 3. Earlier submission time as tie-breaker
+  const timestampA = a.createdAt || (a.date ? new Date(a.date).getTime() : 0);
+  const timestampB = b.createdAt || (b.date ? new Date(b.date).getTime() : 0);
+  return timestampA - timestampB;
+}
+
 export function getLeaderboard(): LeaderboardEntry[] {
   if (typeof window === "undefined") return [];
   try {
@@ -15,12 +43,7 @@ export function getLeaderboard(): LeaderboardEntry[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed)) {
-      return parsed.sort((a, b) => {
-        if (b.score !== a.score) {
-          return b.score - a.score; // Higher score first
-        }
-        return a.completionTimeSeconds - b.completionTimeSeconds; // Faster time first
-      });
+      return parsed.sort(sortLeaderboardEntries);
     }
   } catch (err) {
     console.error("Failed to read leaderboard from localStorage", err);
@@ -36,7 +59,7 @@ export function saveLeaderboardEntry(entry: LeaderboardEntry): boolean {
     if (current.some((e) => e.id === entry.id)) {
       return false;
     }
-    const updated = [...current, entry];
+    const updated = [...current, entry].sort(sortLeaderboardEntries);
     localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(updated));
     return true;
   } catch (err) {
@@ -84,8 +107,9 @@ export function exportLeaderboardCSV(entries: LeaderboardEntry[]): void {
   const headers = [
     "Rank",
     "Gamer Tag",
-    "Score",
+    "Score (/300)",
     "Completion Time (s)",
+    "Time Remaining (s)",
     "Accuracy (%)",
     "Missions Completed",
     "Classification",
@@ -97,8 +121,9 @@ export function exportLeaderboardCSV(entries: LeaderboardEntry[]): void {
   const rows = entries.map((e, idx) => [
     (idx + 1).toString(),
     `"${e.gamerTag.replace(/"/g, '""')}"`,
-    e.score.toString(),
-    e.completionTimeSeconds.toString(),
+    `${e.score}/300`,
+    (e.completionTimeSeconds ?? 0).toString(),
+    (e.timeRemaining ?? Math.max(0, 120 - (e.completionTimeSeconds ?? 0))).toString(),
     `${e.accuracy}%`,
     `${e.missionsCompleted}/3`,
     `"${e.classification}"`,
