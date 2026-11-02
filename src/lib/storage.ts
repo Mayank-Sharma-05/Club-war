@@ -1,4 +1,4 @@
-import { LeaderboardEntry, GameSettings } from "@/types/game";
+import { LeaderboardEntry, GameSettings, MissionResults } from "@/types/game";
 
 const LEADERBOARD_KEY = "databreach_leaderboard_v1";
 const SETTINGS_KEY = "databreach_settings_v1";
@@ -51,19 +51,68 @@ export function getLeaderboard(): LeaderboardEntry[] {
   return [];
 }
 
-export function saveLeaderboardEntry(entry: LeaderboardEntry): boolean {
+export function saveLeaderboardEntry(
+  entry: LeaderboardEntry,
+  missionResults?: MissionResults
+): boolean {
   if (typeof window === "undefined") return false;
   try {
+    // 1. Always save to LocalStorage (ensures zero data loss, offline capability)
     const current = getLeaderboard();
-    // Prevent accidental duplicate submission with identical ID
-    if (current.some((e) => e.id === entry.id)) {
-      return false;
+    if (!current.some((e) => e.id === entry.id)) {
+      const updated = [...current, entry].sort(sortLeaderboardEntries);
+      localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(updated));
     }
-    const updated = [...current, entry].sort(sortLeaderboardEntries);
-    localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(updated));
+
+    // 2. Submit to Supabase asynchronously via server API route
+    submitScoreToSupabase(entry, missionResults).catch((err) => {
+      console.warn("Background Supabase submission fallback active:", err);
+    });
+
     return true;
   } catch (err) {
     console.error("Failed to save entry to leaderboard", err);
+    return false;
+  }
+}
+
+export async function submitScoreToSupabase(
+  entry: LeaderboardEntry,
+  missionResults?: MissionResults
+): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  try {
+    const payload = {
+      id: entry.id,
+      gamerTag: entry.gamerTag,
+      score: entry.score,
+      mission1Score: missionResults?.mission1?.score,
+      mission2Score: missionResults?.mission2?.score,
+      mission3Score: missionResults?.mission3?.score,
+      completionTimeSeconds: entry.completionTimeSeconds,
+      timeRemaining: entry.timeRemaining,
+      accuracy: entry.accuracy,
+      missionsCompleted: entry.missionsCompleted,
+      classification: entry.classification,
+      badges: entry.badges,
+      createdAt: entry.createdAt,
+    };
+
+    const res = await fetch("/api/leaderboard/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errorJson = await res.json().catch(() => ({}));
+      console.warn("Score submission warning:", errorJson);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.warn("Could not reach Supabase submission endpoint:", err);
     return false;
   }
 }
@@ -76,6 +125,55 @@ export function resetLeaderboard(): boolean {
   } catch (err) {
     console.error("Failed to reset leaderboard", err);
     return false;
+  }
+}
+
+export async function clearSupabaseLeaderboard(pin: string): Promise<{ success: boolean; message?: string }> {
+  try {
+    const res = await fetch("/api/leaderboard/clear", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pin }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return { success: false, message: data.error || "Failed to clear Supabase leaderboard" };
+    }
+
+    return { success: true, message: data.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Network error";
+    return { success: false, message };
+  }
+}
+
+export async function migrateLocalStorageToSupabase(): Promise<{ success: boolean; count: number; message?: string }> {
+  const localEntries = getLeaderboard();
+  if (localEntries.length === 0) {
+    return { success: true, count: 0, message: "No local records to migrate." };
+  }
+
+  try {
+    const res = await fetch("/api/leaderboard/migrate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ entries: localEntries }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return { success: false, count: 0, message: data.error || "Migration failed" };
+    }
+
+    return {
+      success: true,
+      count: data.migratedCount || 0,
+      message: data.message,
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Network error during migration";
+    return { success: false, count: 0, message };
   }
 }
 

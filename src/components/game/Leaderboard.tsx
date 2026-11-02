@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Trophy,
@@ -15,9 +15,10 @@ import {
   Lock,
 } from "lucide-react";
 import { LeaderboardEntry } from "@/types/game";
-import { getLeaderboard, resetLeaderboard, getGameSettings } from "@/lib/storage";
+import { resetLeaderboard, getGameSettings, clearSupabaseLeaderboard } from "@/lib/storage";
 import { formatTime } from "@/lib/scoring";
 import { sound } from "@/lib/sound-engine";
+import { useLiveLeaderboard } from "@/hooks/useLiveLeaderboard";
 
 interface LeaderboardProps {
   onBack: () => void;
@@ -30,16 +31,23 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
   onBack,
   onNewGame,
   highlightSessionId,
+  onBackToMain,
 }) => {
-  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+  const { entries, setEntries, isLiveConnected, isConfigured } = useLiveLeaderboard();
   const [search, setSearch] = useState("");
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
   const [pinInput, setPinInput] = useState("");
   const [pinError, setPinError] = useState<string | null>(null);
+  const [isClearing, setIsClearing] = useState(false);
 
-  useEffect(() => {
-    setEntries(getLeaderboard());
-  }, []);
+  const handleBackToMain = () => {
+    sound.playClick();
+    if (onBackToMain) {
+      onBackToMain();
+    } else {
+      onBack();
+    }
+  };
 
   const filteredEntries = entries.filter((e) =>
     e.gamerTag.toLowerCase().includes(search.toLowerCase())
@@ -51,7 +59,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
   const rank3 = top3[2];
   const remainingEntries = filteredEntries.slice(3, 10);
 
-  const handleConfirmClear = () => {
+  const handleConfirmClear = async () => {
     const settings = getGameSettings();
     const correctPin = settings.operatorPin || "1337";
 
@@ -61,12 +69,23 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
       return;
     }
 
-    resetLeaderboard();
-    setEntries([]);
-    setIsClearModalOpen(false);
-    setPinInput("");
-    setPinError(null);
-    sound.playClick();
+    setIsClearing(true);
+    try {
+      // 1. Clear Supabase server-side leaderboard records
+      await clearSupabaseLeaderboard(pinInput.trim());
+
+      // 2. Clear LocalStorage records
+      resetLeaderboard();
+
+      // 3. Update local state
+      setEntries([]);
+      setIsClearModalOpen(false);
+      setPinInput("");
+      setPinError(null);
+      sound.playClick();
+    } finally {
+      setIsClearing(false);
+    }
   };
 
   const renderPodiumCard = (player: LeaderboardEntry, rank: 1 | 2 | 3) => {
@@ -294,26 +313,60 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
         className="w-full max-w-5xl bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-sm my-auto flex flex-col"
       >
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-100 gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-heading font-bold tracking-tight text-slate-900">
-              Tournament Standings
-            </h1>
-            <p className="text-sm font-sans text-slate-500 mt-1">
-              Ranked by highest final score (/300), fastest completion time, and submission order
-            </p>
+        <div className="flex flex-col gap-4 pb-6 border-b border-slate-100">
+          <div className="flex items-center justify-between">
+            {/* Top-left: Back to Main Page Button */}
+            <button
+              onClick={handleBackToMain}
+              className="inline-flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700 hover:text-slate-900 transition-colors cursor-pointer shadow-2xs font-sans group"
+              type="button"
+            >
+              <ArrowLeft className="w-4 h-4 text-slate-500 group-hover:text-slate-800 transition-colors" />
+              <span>Back to Main Page</span>
+            </button>
+
+            {/* Realtime Live Status Badge */}
+            <div className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-[11px] font-sans text-slate-600 shadow-2xs">
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  isLiveConnected
+                    ? "bg-emerald-500 animate-pulse shadow-[0_0_6px_rgba(16,185,129,0.6)]"
+                    : isConfigured
+                    ? "bg-teal-600"
+                    : "bg-slate-400"
+                }`}
+              />
+              <span className="font-medium">
+                {isLiveConnected
+                  ? "Live Realtime"
+                  : isConfigured
+                  ? "Cloud Synced"
+                  : "Local Machine"}
+              </span>
+            </div>
           </div>
 
-          {/* Search Box */}
-          <div className="relative w-full sm:w-64">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search by callsign..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 focus:border-teal-700 focus:ring-1 focus:ring-teal-700 rounded-xl text-xs text-slate-900 focus:outline-none placeholder:text-slate-400 font-sans"
-            />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-heading font-bold tracking-tight text-slate-900">
+                Tournament Standings
+              </h1>
+              <p className="text-sm font-sans text-slate-500 mt-1">
+                Ranked by highest final score (/300), fastest completion time, and submission order
+              </p>
+            </div>
+
+            {/* Search Box */}
+            <div className="relative w-full sm:w-64">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search by callsign..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 focus:border-teal-700 focus:ring-1 focus:ring-teal-700 rounded-xl text-xs text-slate-900 focus:outline-none placeholder:text-slate-400 font-sans"
+              />
+            </div>
           </div>
         </div>
 
@@ -535,7 +588,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
                   Are you sure you want to delete all leaderboard records?
                 </p>
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  This will immediately erase all player scores from this machine. Game settings and system configurations will not be affected.
+                  This will immediately erase all player scores from Supabase cloud database and local storage. Game settings and system configurations will not be affected.
                 </p>
 
                 {/* Organizer PIN Authorization Step */}
@@ -549,6 +602,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
                     maxLength={8}
                     placeholder="Enter PIN to authorize"
                     value={pinInput}
+                    disabled={isClearing}
                     onChange={(e) => {
                       setPinInput(e.target.value);
                       if (pinError) setPinError(null);
@@ -575,6 +629,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
                     setPinInput("");
                     setPinError(null);
                   }}
+                  disabled={isClearing}
                   className="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 hover:text-slate-900 text-xs font-medium transition-colors cursor-pointer"
                 >
                   Cancel
@@ -582,10 +637,11 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
 
                 <button
                   onClick={handleConfirmClear}
-                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium flex items-center space-x-1.5 transition-colors cursor-pointer shadow-xs"
+                  disabled={isClearing}
+                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium flex items-center space-x-1.5 transition-colors cursor-pointer shadow-xs disabled:opacity-50"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
-                  <span>Confirm Clear</span>
+                  <span>{isClearing ? "Clearing..." : "Confirm Clear"}</span>
                 </button>
               </div>
             </motion.div>

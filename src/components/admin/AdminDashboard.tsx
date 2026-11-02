@@ -14,9 +14,19 @@ import {
   AlertTriangle,
   Lock,
   KeyRound,
+  CloudUpload,
+  CheckCircle2,
 } from "lucide-react";
 import { LeaderboardEntry } from "@/types/game";
-import { getLeaderboard, resetLeaderboard, exportLeaderboardCSV, getGameSettings, saveGameSettings } from "@/lib/storage";
+import {
+  getLeaderboard,
+  resetLeaderboard,
+  exportLeaderboardCSV,
+  getGameSettings,
+  saveGameSettings,
+  clearSupabaseLeaderboard,
+  migrateLocalStorageToSupabase,
+} from "@/lib/storage";
 import { formatTime } from "@/lib/scoring";
 import { sound } from "@/lib/sound-engine";
 
@@ -37,6 +47,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [showConfirmReset, setShowConfirmReset] = useState(false);
   const [newPin, setNewPin] = useState("");
   const [pinChangeSuccess, setPinChangeSuccess] = useState(false);
+  const [isMigrating, setIsMigrating] = useState(false);
+  const [migrationStatus, setMigrationStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -46,6 +58,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setPinInput("");
       setPinError(false);
       setShowConfirmReset(false);
+      setMigrationStatus(null);
     }
   }, [isOpen]);
 
@@ -65,11 +78,35 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
     sound.playIncorrect();
     resetLeaderboard();
     setRecords([]);
     setShowConfirmReset(false);
+    try {
+      await clearSupabaseLeaderboard(pinInput || settings.operatorPin);
+    } catch {
+      // Supabase may not be configured, local reset already completed
+    }
+  };
+
+  const handleSyncToCloud = async () => {
+    sound.playClick();
+    setIsMigrating(true);
+    setMigrationStatus(null);
+    try {
+      const res = await migrateLocalStorageToSupabase();
+      if (res.success) {
+        setMigrationStatus(`Successfully synced ${res.count} records to Supabase.`);
+      } else {
+        setMigrationStatus(`Sync notice: ${res.message}`);
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Sync failed";
+      setMigrationStatus(`Sync error: ${msg}`);
+    } finally {
+      setIsMigrating(false);
+    }
   };
 
   const handleExportCSV = () => {
@@ -228,7 +265,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 />
               </div>
 
-              <div className="flex items-center space-x-2 w-full sm:w-auto">
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                <button
+                  onClick={handleSyncToCloud}
+                  disabled={records.length === 0 || isMigrating}
+                  title="Upload local records to Supabase cloud"
+                  className="flex-1 sm:flex-initial flex items-center justify-center space-x-1.5 px-3.5 py-2 rounded-xl bg-teal-50 hover:bg-teal-100 border border-teal-200 text-xs font-medium text-teal-800 disabled:opacity-40 transition-colors cursor-pointer shadow-2xs"
+                >
+                  <CloudUpload className={`w-4 h-4 ${isMigrating ? "animate-bounce" : ""}`} />
+                  <span>{isMigrating ? "Syncing..." : "Sync to Supabase"}</span>
+                </button>
+
                 <button
                   onClick={handleExportCSV}
                   disabled={records.length === 0}
@@ -248,6 +295,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </button>
               </div>
             </div>
+
+            {migrationStatus && (
+              <div className="px-3 py-2 rounded-lg bg-teal-50 border border-teal-200 text-xs text-teal-800 flex items-center space-x-2">
+                <CheckCircle2 className="w-4 h-4 shrink-0 text-teal-600" />
+                <span>{migrationStatus}</span>
+              </div>
+            )}
 
             {/* Records Table */}
             <div className="border border-slate-200 rounded-xl overflow-hidden bg-white">

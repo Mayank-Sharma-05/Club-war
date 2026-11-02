@@ -10,6 +10,7 @@ import { evaluateAchievements } from "@/lib/achievements";
 import { saveLeaderboardEntry, getGameSettings, saveGameSettings, getLeaderboard } from "@/lib/storage";
 import { sound } from "@/lib/sound-engine";
 import { chiefSpeech } from "@/lib/chief/speech-manager";
+import { ensureValidUuid } from "@/lib/supabase/types";
 
 // UI Components
 import { GameHeader } from "@/components/game/GameHeader";
@@ -160,7 +161,7 @@ export default function Home() {
       mission3: { completed: false, attemptsUsed: 0, score: 0, unlocked: false },
     });
 
-    const newId = `session-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+    const newId = ensureValidUuid();
     setSessionId(newId);
   }, []);
 
@@ -226,7 +227,7 @@ export default function Home() {
         currentEntries.length > 0 && calculatedScore > previousHighScore;
 
       const entry: LeaderboardEntry = {
-        id: sessionId || `session-${Date.now()}`,
+        id: sessionId || ensureValidUuid(),
         gamerTag: gamerTag || "ANALYST",
         score: calculatedScore,
         completionTimeSeconds: elapsedSeconds,
@@ -244,7 +245,7 @@ export default function Home() {
         classification,
       };
 
-      saveLeaderboardEntry(entry);
+      saveLeaderboardEntry(entry, activeResults);
       setHasRecordedScore(true);
       setScreen("results");
 
